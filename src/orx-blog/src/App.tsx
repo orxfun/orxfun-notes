@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import {
-  BrowserRouter,
+  HashRouter,
   Route,
   Routes,
 } from 'react-router-dom';
@@ -29,7 +29,7 @@ function App() {
   const pageOf = (page: ReactNode) => <Page leftNav={leftNav} page={page} />;
 
   return (
-    <BrowserRouter basename={process.env.PUBLIC_URL}>
+    <HashRouter basename={process.env.PUBLIC_URL}>
       <Routes>
         {
           pageMetas.map(x => {
@@ -39,7 +39,7 @@ function App() {
           })
         }
       </Routes>
-    </BrowserRouter>
+    </HashRouter >
   );
 }
 
