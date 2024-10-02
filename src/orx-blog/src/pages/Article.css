@@ -1,0 +1,96 @@
+.article {
+    color: white;
+    padding: 3rem 5rem 0 5rem;
+    font-size: 1.0rem;
+    text-align: justify;
+    height: 100%;
+    overflow-y: auto;
+    min-width: 40rem;
+    max-width: 60rem;
+}
+
+.article h1,
+.article h2,
+.article h3,
+.article h4,
+.article h5 {
+    padding: 2.5rem 0 1rem 0;
+    text-align: center;
+}
+
+.article h1 {
+    color: white;
+    font-size: 1.5rem;
+}
+
+.article h2 {
+    color: white;
+    font-size: 1.25rem;
+    border-bottom: 1px solid silver;
+}
+
+.article .date {
+    color: #999900;
+    display: block;
+    text-align: center;
+    padding-bottom: 2.5rem;
+}
+
+
+.article a,
+.article a:visited,
+.article a:link,
+.article a:hover,
+.article a:active {
+    color: yellow;
+    text-decoration: none;
+}
+
+.article p code,
+.article li code,
+.article h2 code,
+.article .box code {
+    font-family: monospace;
+    color: #669999;
+    text-shadow: 0 0 1px #669999;
+}
+
+.article .emphasis {
+    text-align: center;
+    padding: 0.5rem 0.5rem;
+    border-left: 3px solid #4d3d00;
+    border-right: 3px solid #4d3d00;
+    color: #ffcc00;
+}
+
+.article .side-note {
+    font-style: italic;
+    text-align: center;
+    padding: 0.5rem 0.5rem;
+    color: gray;
+}
+
+.article .end-space {
+    display: block;
+    height: 10rem;
+}
+
+.article p {
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.article .boxes-flow {
+    display: flex;
+    gap: 0.4rem;
+    width: 95%;
+}
+
+.article .box {
+    flex-grow: 1;
+    flex-basis: 0;
+    border: 1px solid #669999;
+    padding: 1rem;
+    display: grid;
+    text-align: center;
+}
