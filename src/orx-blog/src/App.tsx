@@ -1,11 +1,14 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
-import { Home } from './pages/Home';
-import { Article } from './pages/Article';
 import { ReactNode } from "react";
+import {
+  BrowserRouter,
+  Route,
+  Routes,
+} from 'react-router-dom';
 import { LeftNav } from "./LeftNav";
-import './Page.css';
 import { Page } from "./Page";
+import './Page.css';
 import { PageMetaImpVecMotivation } from "./articles/ImpVecMotivation";
+import { Home } from './pages/Home';
 
 export type PageMeta = {
   path: string,
@@ -20,19 +23,18 @@ function App() {
   const pageMetas: PageMeta[] = [
     { path: '/', page: <Home />, title: 'home', date: '', summary: '' },
     PageMetaImpVecMotivation(),
-    // { path: `/linked-list`, page: <Article />, title: 'LinkedList', date: '2025-01-01', summary: "about linked lists" },
   ];
 
   const leftNav = <LeftNav pageMetas={pageMetas} />;
   const pageOf = (page: ReactNode) => <Page leftNav={leftNav} page={page} />;
 
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={process.env.PUBLIC_URL}>
       <Routes>
         {
-          pageMetas.map((x, i) => {
+          pageMetas.map(x => {
             return (
-              <Route key={i} path={x.path} element={pageOf(x.page)} />
+              <Route key={x.path} path={x.path} element={pageOf(x.page)} />
             )
           })
         }

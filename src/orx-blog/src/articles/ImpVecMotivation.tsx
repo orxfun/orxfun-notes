@@ -2,7 +2,7 @@ import { Article } from "../pages/Article";
 import { Code } from "./Code";
 import { Link } from "./Link";
 
-const path = '/imp-vec-motivation/2024-10-03';
+const path = '/imp-vec-motivation-2024-10-03';
 const title = 'Index Trait, Pinned Elements and Immutable Push Vector';
 const date = '2024-10-03';
 const summary = 'The motivation behind the ImpVec.'
