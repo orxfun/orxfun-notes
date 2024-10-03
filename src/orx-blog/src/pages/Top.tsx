@@ -44,7 +44,8 @@ export const Top = () => {
 
             <Link
                 text={imgHome}
-                href="/"
+                href={process.env.PUBLIC_URL}
+                target={"page"}
             />
 
             <span>{verticalBar}</span>

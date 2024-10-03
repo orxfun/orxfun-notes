@@ -113,7 +113,7 @@ const Content = () => {
                     This initial attempt sets the motivation of the desired crate.
                 </p>
 
-                <p className="emphasis">
+                <div className="emphasis">
                     We want rust to understand the syntax we use.
 
                     <br /><br />
@@ -123,7 +123,7 @@ const Content = () => {
                     <Code code="let le = 3 * x[0] + 4 * x[7];" />
 
                     which is not longer and not more verbose than on-paper version.
-                </p>
+                </div>
 
             </section>
 
@@ -151,33 +151,33 @@ const Content = () => {
                 </p>
 
                 <div className="seq">
-                    <p>
+                    <div>
                         <code>Vector</code> does not actually store any <code>Var</code>.
-                    </p>
+                    </div>
 
-                    <p>
+                    <div>
                         We couldn't store even if we wanted since there are infinitely many <code>Var</code>s.
-                    </p>
+                    </div>
 
-                    <p>
+                    <div>
                         When <code>x[i]</code> is called, <code>x</code> has to produce <code>Var &#123; index = i, vector = x &#125;</code> for any <code>i</code>.
-                    </p>
+                    </div>
 
-                    <p>
+                    <div>
                         For the <code>Index</code> trait, we need to implement <code>fn index(&self, index: usize) -&gt; &Var&lt;'a&gt;</code>.
-                    </p>
+                    </div>
 
-                    <p>
+                    <div>
                         We have to return a reference.
-                    </p>
+                    </div>
 
-                    <p>
+                    <div>
                         We cannot return a reference to the temporary <code>Var</code> that we create inside the <code>index</code> function.
-                    </p>
+                    </div>
 
-                    <p>
+                    <div>
                         We must store the <code>Var</code> somewhere, we must store it long enough.
-                    </p>
+                    </div>
                 </div>
 
                 <div className="side-note">
@@ -191,10 +191,10 @@ const Content = () => {
                 </p>
 
                 <div className="seq">
-                    <p>each time <code>x[i]</code> is called for some <code>i</code>,</p>
-                    <p>we create the <code>Var</code> inside the <code>index</code> method,</p>
-                    <p>store it in <code>created_vars</code> field of the <code>Vector</code>, and then</p>
-                    <p>return the reference to the last element of <code>created_vars</code> which is the new variable.</p>
+                    <div>each time <code>x[i]</code> is called for some <code>i</code>,</div>
+                    <div>we create the <code>Var</code> inside the <code>index</code> method,</div>
+                    <div>store it in <code>created_vars</code> field of the <code>Vector</code>, and then</div>
+                    <div>return the reference to the last element of <code>created_vars</code> which is the new variable.</div>
                 </div>
 
                 <p>
@@ -296,11 +296,11 @@ const Content = () => {
                 <code className="danger">constructing invalid value: encountered a dangling reference (use-after-free)</code>
 
                 <p>We can have a few takeaways from this attempt:</p>
-                <p className="emphasis">
+                <div className="emphasis">
                     <p>◉ Task would be much simpler if <code>Index</code> could return a <code>Copy</code> type by value.</p>
                     <p>◉ Things can go wrong in various ways in the <code>unsafe</code> land.</p>
                     <p>◉ It would be nice if memory positions of elements could remain intact.</p>
-                </p>
+                </div>
 
             </section>
 
@@ -308,7 +308,8 @@ const Content = () => {
                 <h2>Open Rust Issue</h2>
 
                 <p>
-                    There is an open <Link text="rust-lang issue" href="https://github.com/rust-lang/rfcs/issues/997" /> about extensions of the <code>Index</code> trait.
+                    There is an open <Link text="rust-lang issue" href="https://github.com/rust-lang/rfcs/issues/997" /> about extensions
+                    of the <code>Index</code> trait.
                     It is closely related and there are several very common use cases discussed in the issue.
                     Recommended <code>IndexGet</code> extension seems to be promising to solve the problem discussed here, and many others.
                     Watching closely :)
@@ -367,13 +368,13 @@ const Content = () => {
                 </p>
 
                 <div className="seq">
-                    <p>
+                    <div>
                         We changed the type of our cache from <code>UnsafeCell&lt;Vec&lt;Var&lt;'a&gt;&gt;&gt;</code> to <code>ImpVec&lt;Var&lt;'a&gt;&gt;</code>
-                    </p>
+                    </div>
 
-                    <p>
+                    <div>
                         We replaced the unsafe code in the <code>index</code> method with the safe <code>imp_push_get_ref</code> method of the <code>ImpVec</code>
-                    </p>
+                    </div>
                 </div>
 
                 <p className="side-note">
