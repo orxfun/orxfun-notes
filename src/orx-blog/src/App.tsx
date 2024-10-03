@@ -1,10 +1,10 @@
 import { ReactNode } from "react";
 import { Route, Routes } from 'react-router-dom';
-import { LeftNav } from "./LeftNav";
-import { Page } from "./Page";
-import './Page.css';
 import { PageMetaImpVecMotivation } from "./articles/ImpVecMotivation";
 import { Home } from './pages/Home';
+import './Page.css';
+import { Top } from "./pages/Top";
+import { Page } from "./Page";
 
 export type PageMeta = {
   path: string,
@@ -16,24 +16,28 @@ export type PageMeta = {
 
 function App() {
 
-  const pageMetas: PageMeta[] = [
-    { path: '/', page: <Home />, title: 'home', date: '', summary: '' },
+  const articles: PageMeta[] = [
     PageMetaImpVecMotivation(),
   ];
 
-  const leftNav = <LeftNav pageMetas={pageMetas} />;
-  const pageOf = (page: ReactNode) => <Page leftNav={leftNav} page={page} />;
+  const top = <Top />;
+  const pageOf = (article: ReactNode) => <Page top={top} article={article} />;
+
+  const home = pageOf(<Home articles={articles} />);
 
   return (
-    <Routes>
-      {
-        pageMetas.map(x => {
-          return (
-            <Route key={x.path} path={x.path} element={pageOf(x.page)} />
-          )
-        })
-      }
-    </Routes>
+    <div className="page">
+      <Routes>
+        <Route path="/" element={home} />
+        {
+          articles.map(x => {
+            return (
+              <Route key={x.path} path={x.path} element={pageOf(x.page)} />
+            )
+          })
+        }
+      </Routes>
+    </div>
   );
 }
 

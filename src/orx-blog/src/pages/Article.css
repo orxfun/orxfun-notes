@@ -1,12 +1,17 @@
+:root {
+    --color-code: #669999;
+    --color-emphasis: #e6e600;
+}
+
+
 .article {
     color: white;
-    padding: 3rem 5rem 0 5rem;
+    padding: 0;
     font-size: 1.0rem;
     text-align: justify;
-    height: 100%;
     overflow-y: auto;
-    min-width: 40rem;
-    max-width: 60rem;
+    width: 100%;
+    height: calc(100vh - 3rem);
 }
 
 .article h1,
@@ -34,6 +39,7 @@
     display: block;
     text-align: center;
     padding-bottom: 2.5rem;
+    font-size: smaller;
 }
 
 
@@ -51,8 +57,8 @@
 .article h2 code,
 .article .box code {
     font-family: monospace;
-    color: #669999;
-    text-shadow: 0 0 1px #669999;
+    color: var(--color-code);
+    text-shadow: 0 0 1px var(--color-code);
 }
 
 .article .emphasis {
@@ -60,7 +66,7 @@
     padding: 0.5rem 0.5rem;
     border-left: 3px solid #4d3d00;
     border-right: 3px solid #4d3d00;
-    color: #ffcc00;
+    color: var(--color-emphasis);
 }
 
 .article .side-note {
@@ -80,7 +86,7 @@
     margin-bottom: 1.5rem;
 }
 
-.article .boxes-flow {
+.article .boxes {
     display: flex;
     gap: 0.4rem;
     width: 95%;
@@ -89,8 +95,85 @@
 .article .box {
     flex-grow: 1;
     flex-basis: 0;
-    border: 1px solid #669999;
+    border: 1px solid var(--color-code);
     padding: 1rem;
     display: grid;
     text-align: center;
+}
+
+.article .box p {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.article .box .hor-line {
+    width: 90%;
+    padding: 0 5%;
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+    height: 0.10rem;
+    background-color: var(--color-code);
+}
+
+.article .seq p {
+    margin-top: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.article .seq p::before {
+    content: '⮩ ';
+    color: var(--color-emphasis);
+}
+
+
+.article .seq p:nth-child(2) {
+    padding-left: calc(1 * 0.9rem);
+}
+
+.article .seq p:nth-child(3) {
+    padding-left: calc(2 * 0.9rem);
+}
+
+.article .seq p:nth-child(4) {
+    padding-left: calc(3 * 0.9rem);
+}
+
+.article .seq p:nth-child(5) {
+    padding-left: calc(4 * 0.9rem);
+}
+
+.article .seq p:nth-child(6) {
+    padding-left: calc(5 * 0.9rem);
+}
+
+.article .seq p:nth-child(7) {
+    padding-left: calc(6 * 0.9rem);
+}
+
+.article .seq p:nth-child(8) {
+    padding-left: calc(7 * 0.9rem);
+}
+
+.article .seq p:nth-child(9) {
+    padding-left: calc(8 * 0.9rem);
+}
+
+.article .seq p:nth-child(10) {
+    padding-left: calc(9 * 0.9rem);
+}
+
+.article .tick::before {
+    content: ' ✓ ';
+    color: #00cc00;
+    font-weight: bold;
+}
+
+.article .fail::before {
+    content: ' ✗ ';
+    color: #ff3300;
+    font-weight: bold;
+}
+
+.article .danger {
+    color: #ff1a1a;
 }

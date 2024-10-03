@@ -1,0 +1,37 @@
+.home {
+    display: grid;
+    grid-template-rows: 8rem auto;
+}
+
+.home .contacts {
+    width: 100%;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    align-items: center;
+    background-color: white;
+    border-radius: 1rem;
+}
+
+.home h1 {
+    border-bottom: 0.2rem solid white;
+}
+
+.home .articles-list {
+    max-height: calc(100vh - 14rem);
+    overflow-y: auto;
+}
+
+.home .articles-list .link {
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 0;
+    padding: 0 1rem;
+    line-height: 1rem;
+    max-height: 2rem;
+
+}
+
+.home .articles-list .link .date {
+    text-align: right;
+}

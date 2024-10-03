@@ -1,15 +1,19 @@
 import { ReactNode } from 'react';
 
 type PageProps = {
-    leftNav: ReactNode,
-    page: ReactNode,
+    top: ReactNode,
+    article: ReactNode,
 }
 
-export const Page = ({ leftNav, page }: PageProps) => {
+export const Page = ({ top, article }: PageProps) => {
     return (
         <div className='page'>
-            <div className='left'>{leftNav}</div>
-            <div className='main'>{page}</div>
+            {top}
+            <div className='main'>
+                <div></div>
+                {article}
+                <div></div>
+            </div>
         </div>
     );
 }

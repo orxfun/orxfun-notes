@@ -17,7 +17,7 @@ const Content = () => {
     return (
         <>
             <h1>{title}</h1>
-            <span className="date"><Link text="orxfun" href="https://github.com/orxfun/" /> | {date}</span>
+            <span className="date">{date}</span>
 
             <p>
                 The title sounds like a list of unrelated topics.
@@ -58,35 +58,71 @@ const Content = () => {
                 </p>
 
                 <p>
-                    Importantly note that <code>x</code> is a symbolic vector, say <code>Vector</code>, which is nothing like the
+                    Importantly note that <code>x</code> is a symbolic vector, say <code>Vector</code>, which is nothing like a
                     materialized <code>std::vec::Vec</code>. <code>x[i]</code> still represents the i-th element of this vector, which is
                     another symbolic type, let's call it <code>Var</code>. As a result, <code>le</code> is not an eagerly evaluated value
                     but an expression.
                 </p>
 
+                <p>
+                    If we take a closer look at the example expression, we see four types:
+                </p>
+
+                <div className="boxes">
+                    <div className="box">
+                        Vector
+                        <div className="hor-line"></div>
+                        <code>x</code>
+                    </div>
+
+                    <div className="box">
+                        Var
+                        <div className="hor-line"></div>
+                        <code>x[7]</code>
+                    </div>
+
+                    <div className="box">
+                        Term
+                        <div className="hor-line"></div>
+                        <code>3 * x[0]</code>
+                    </div>
+
+                    <div className="box">
+                        Expr
+                        <div className="hor-line"></div>
+                        <code>3 * x[0] + 4 * x[7]</code>
+                    </div>
+                </div>
+
+                <p>
+                    The easiest way to demonstrate the target syntax is to look at what we certainly do not want:)
+                    Absolute opposite of the desired solution is demonstrated in the following code block:
+                </p>
+
+                <Code code={codeUglySolution} />
+
+                <p>
+                    Note that this is a simple and nice rust code.
+                    We can read, follow and understand it.
+                    However, it is not immediate.
+                    Understanding this simple expression should have been immediate.
+                    So with this syntax, we'd have no luck when we work with a system of inequalities.
+                </p>
+
+                <p>
+                    This initial attempt sets the motivation of the desired crate.
+                </p>
+
                 <p className="emphasis">
-                    The goal is to create a library that makes the code block above valid rust code defining the linear expression;
+                    We want rust to understand the syntax we use.
+
+                    <br /><br />
+
+                    The goal is to create a library that makes the following a valid rust code
+
+                    <Code code="let le = 3 * x[0] + 4 * x[7];" />
+
                     which is not longer and not more verbose than on-paper version.
-                </p>
-
-                <p>
-                    In order to achieve this expressive and concise syntax demonstrated above, we want to avoid any <code>&</code> usage.
-                    And we need to avoid typing <code>clone()</code> at all costs.
-                </p>
-
-                <p>
-                    If we take a closer look at the example expression, we see three types:
-                </p>
-
-                <ul>
-                    <li><code>Expr</code> ⇒ <code>3 * x[0] + 4 * x[7]</code></li>
-                    <li><code>Term</code> ⇒ <code>3 * x[0]</code> or <code>4 * x[7]</code></li>
-                    <li><code>Var</code> ⇒ <code>x[0]</code> or <code>x[7]</code></li>
-                </ul>
-
-                <p>
-                    And of course, we have <code>x</code> which is a <code>Vector</code>.
-                    Its Index operator outputs a <code>Var</code> which leads to the following ..
                 </p>
 
             </section>
@@ -99,14 +135,9 @@ const Content = () => {
                 </p>
 
                 <p>
-                    Before defining the problem, let's introduce two relevant types:
-                </p>
-
-                <Code code={codeRelevantTypes} />
-
-                <p>
-                    <code>Vector</code> is nothing but a symbol.
-                    A <code>Var</code> is defined by two things: an <code>index</code> and a reference to its parent <code>vector</code> that created it.
+                    Two types are relevant to the problem.
+                    First is <code>Vector</code> which is nothing but a symbol.
+                    Second is the <code>Var</code> which contains an <code>index</code> and a reference to its parent <code>vector</code> that created it.
                 </p>
 
                 <p className="side-note">
@@ -116,52 +147,54 @@ const Content = () => {
                 </p>
 
                 <p>
-                    The index problem we have here is as follows:
+                    The problem we have here is actually common and can be summarized as follows:
                 </p>
 
-                <ul>
-                    <li><code>Vector</code> does not actually store <code>Var</code>s.</li>
-                    <li>
-                        Even if we wanted, we wouldn't be able to store <code>Var</code>s because there are infinitely many of them.
-                    </li>
-                    <li>
-                        When <code>x[i]</code> is called, <code>x</code> has to produce a <code>Var &#123; index = i, vector = x &#125;</code>.
-                        No index is out of bounds.
-                    </li>
-                    <li>
-                        The method we need to implement for the <code>Index</code> trait is <code>fn index(&self, index: usize) -&gt; &Var&lt;'a&gt;</code>.
-                        We have to return a reference.
-                        <ul>
-                            <li>We cannot return a reference to the temporary <code>Var</code> that we create inside the index function.</li>
-                            <li>We must store the <code>Var</code> somewhere, and we must store it long enough.</li>
-                        </ul>
-                    </li>
-                </ul>
+                <div className="seq">
+                    <p>
+                        <code>Vector</code> does not actually store any <code>Var</code>.
+                    </p>
 
-                <p><strong>
-                    Unfortunately, we cannot get around the reference requirement even if we are returning a <code>Copy</code> value such as <code>Var</code>.
-                </strong></p>
+                    <p>
+                        We couldn't store even if we wanted since there are infinitely many <code>Var</code>s.
+                    </p>
+
+                    <p>
+                        When <code>x[i]</code> is called, <code>x</code> has to produce <code>Var &#123; index = i, vector = x &#125;</code> for any <code>i</code>.
+                    </p>
+
+                    <p>
+                        For the <code>Index</code> trait, we need to implement <code>fn index(&self, index: usize) -&gt; &Var&lt;'a&gt;</code>.
+                    </p>
+
+                    <p>
+                        We have to return a reference.
+                    </p>
+
+                    <p>
+                        We cannot return a reference to the temporary <code>Var</code> that we create inside the <code>index</code> function.
+                    </p>
+
+                    <p>
+                        We must store the <code>Var</code> somewhere, we must store it long enough.
+                    </p>
+                </div>
+
+                <div className="side-note">
+                    <p>
+                        Unfortunately, we cannot get around the reference requirement even if we are returning a <code>Copy</code> value such as <code>Var</code>.
+                    </p>
+                </div>
 
                 <p>
-                    Then, the solution seems to be as follows:
+                    We can have a workaround as follows to solve our problem:
                 </p>
-                <div className="boxes-flow">
-                    <div className="box">
-                        each time <code>x[i]</code> is called for some i
-                    </div>
 
-                    <div className="box">
-                        we create the <code>Var</code> inside the <code>index</code> method
-                    </div>
-
-                    <div className="box">
-                        store it in <code>created_vars</code> field of the <code>Vector</code>
-                    </div>
-
-                    <div className="box">
-                        and return the reference to the element of <code>created_vars</code>
-                        that we stored the new variable
-                    </div>
+                <div className="seq">
+                    <p>each time <code>x[i]</code> is called for some <code>i</code>,</p>
+                    <p>we create the <code>Var</code> inside the <code>index</code> method,</p>
+                    <p>store it in <code>created_vars</code> field of the <code>Vector</code>, and then</p>
+                    <p>return the reference to the last element of <code>created_vars</code> which is the new variable.</p>
                 </div>
 
                 <p>
@@ -179,7 +212,7 @@ const Content = () => {
 
                 <p className="side-note">
                     The cache will keep growing; however, this is insignificant for the use case.
-                    We will represent systems of arbitrary sizes with several linear expressions.
+                    We will represent systems of arbitrary sizes with several expressions.
                 </p>
 
                 <p>
@@ -195,90 +228,77 @@ const Content = () => {
                 </p>
 
                 <p>
-                    In the demonstration, we create the vector <code>x</code> and create a <code>Var</code> out of it by calling <code>x[0]</code>.
-                    Note that we don't need to use <code>&x[0]</code> since <code>Var</code> implements <code>Copy</code>.
-                    The assertion passes, all good.
+                    In the demo, we create the vector <code>x</code> and create a <code>Var</code> out of it by calling <code>x[0]</code>.
+                    We don't need to use <code>&x[0]</code> since <code>Var</code> implements <code>Copy</code>.
+                    The assertion passes, all good
+                    <span className="tick" />
                 </p>
 
                 <p>
                     To test it a little further, we create a thousand vars and collect them in <code>vars1</code> vec.
-                    Then, we test them one by one.
-                    All tests succeed.
-                    Still good.
+                    We test them one by one, all succeed
+                    <span className="tick" />
                 </p>
 
                 <p>
-                    We do (almost!) the same thing again to create <code>vars2</code> vec
-                    and we suddenly get an <span style={{ fontWeight: 'bold', color: 'red' }}>undefined behavior</span>.
+                    We do (almost) the same thing again to create <code>vars2</code> vec
+                    and we suddenly get an <span className="danger">undefined behavior</span>
+                    <span className="fail" />
                 </p>
 
-                <p>
-                    What went wrong?
-                </p>
-
-                <p>
-                    Why is <code>vars1</code> memory safe but using <code>vars2</code> leads to UB?
-                </p>
+                <div className="emphasis">
+                    <p>
+                        Why is <code>vars1</code> memory safe but using <code>vars2</code> leads to UB?
+                    </p>
+                </div>
 
                 <p>
                     The problem might be immediately clear for some,
                     and it might be a bit hidden for others.
-                    Different types of elements of the two vectors help us to understand:
                 </p>
-                <ul>
-                    <li>
-                        <code>let vars1: Vec&lt;Var&gt; = (0..1000).map(|i| x[i]).collect();</code>
-                        <ul>
-                            <li>
-                                <code>index</code> operator returns <code>&Var</code>.
-                                However, while creating <code>vars1</code>,
-                                we copy the value and store it as an owned <code>Var</code>,
-                                and immediately throw away the reference.
-                            </li>
-                        </ul>
-                    </li>
-                    <li>
-                        <code>let vars2: Vec&lt;&Var&gt; = (0..1000).map(|i| &x[i]).collect();</code>
-                        <ul>
-                            <li>
-                                Here, we don't copy.
-                            </li>
-                            <li>
-                                We directly store returned references in our vector, hence the type <code>Vec&lt;&Var&gt;</code>.
-                            </li>
-                            <li>
-                                However, these <strong>references are invalid</strong> and using them is UB.
-                            </li>
-                            <li>
-                                This is because our cache is a <code>std::vec::Vec</code>,
-                                and <code>Vec</code> has the freedom to move elements
-                                around in order to keep the storage contagious.
-                            </li>
-                        </ul>
-                    </li>
-                </ul>
+
+                <div className="boxes">
+                    <div className="box">
+                        <code>let vars1: Vec&lt;Var&gt;</code>
+                        <div className="hor-line" />
+                        <p><code>index</code> operator returns <code>&Var</code></p>
+                        <p>we copy and store the variable as an owned <code>Var</code></p>
+                        <p>and immediately throw away the reference</p>
+                    </div>
+
+                    <div className="box">
+                        <code>let vars2: Vec&lt;&Var&gt;</code>
+                        <div className="hor-line" />
+                        <p>here, we don't copy</p>
+                        <p>we directly store returned references in our vector</p>
+                        <p>these <span className="danger">references are invalid</span> and using them is UB</p>
+                    </div>
+                </div>
+
+                <p>
+                    The references are invalid because our cache is a <code>std::vec::Vec</code>,
+                    and <code>Vec</code> has the freedom to move elements
+                    around in order to keep the storage contagious.
+                </p>
 
                 <p>
                     You may run the program and see that all assertions succeed and program exits normally.
+                    However, this does not prove the absence of the memory problem.
+                    If we keep using it, we will eventually encounter the UB.
                 </p>
-                <ul><li>
-                    <code>cargo run --example vector_var_unsafe_cell_vec</code>
-                </li></ul>
 
                 <p>
-                    This does not prove the absence of the memory problem.
-                    If we keep using it, we will eventually encounter the UB.
-                    Thankfully, we have <strong>miri</strong> which would immediately tell us the problem.
+                    Thankfully, we have <strong>miri</strong> to tell us the problem right away.
                 </p>
-                <ul>
-                    <li><code>cargo run +nightly miri --example vector_var_unsafe_cell_vec</code></li>
-                    <li><span style={{ fontWeight: 'bold', color: 'red' }}>constructing invalid value: encountered a dangling reference (use-after-free)</span></li>
-                </ul>
+
+                <code>cargo run +nightly miri --example vector_var_unsafe_cell_vec</code>
+                <br />
+                <code className="danger">constructing invalid value: encountered a dangling reference (use-after-free)</code>
 
                 <p>We can have a few takeaways from this attempt:</p>
                 <p className="emphasis">
-                    <p>◉ Things would be much easier if <code>Index</code> could return a <code>Copy</code> type by value.</p>
-                    <p>◉ As we all know very well, things can go wrong in various ways in the <code>unsafe</code> land.</p>
+                    <p>◉ Task would be much simpler if <code>Index</code> could return a <code>Copy</code> type by value.</p>
+                    <p>◉ Things can go wrong in various ways in the <code>unsafe</code> land.</p>
                     <p>◉ It would be nice if memory positions of elements could remain intact.</p>
                 </p>
 
@@ -299,27 +319,33 @@ const Content = () => {
             <section>
                 <h2>Solution with Pinned Elements and <code>ImpVec</code></h2>
 
-                <p>Converging back to the title.</p>
+                <p>
+                    Back to the title to iterate the workaround
+                    using <Link text="PinnedVec" href="https://crates.io/crates/orx-pinned-vec" />&nbsp;
+                    and <Link text="ImpVec" href="https://crates.io/crates/orx-imp-vec" />.
+                </p>
 
                 <p>
-                    First, we observed that our workaround fails due to vec elements moving around in memory as our vector grows.
-                    How can we fix this?
+                    Our workaround failed due to elements of the vec moving around in memory as the vector grows.
                 </p>
 
                 <p className="emphasis">
-                    A vector implementing the <Link text="PinnedVec" href="https://crates.io/crates/orx-pinned-vec" /> trait
+                    A vector implementing the <code>PinnedVec</code> trait
                     guarantees that elements added to the vector are pinned to their memory locations unless explicitly changed.
                 </p>
 
                 <p>
-                    Second, we saw that unsafe usage of interior mutability on a vec is <strong>way too powerful</strong> for our use case.
+                    We saw that unsafe usage of interior mutability on a vec is <strong>way too powerful</strong> for our use case.
                     It allows us to do so many wrong things.
-                    Can we have a safe wrapper that allows us only to cache <code>Var</code>s?
                 </p>
 
                 <p className="emphasis">
-                    An <Link text="ImpVec" href="https://crates.io/crates/orx-imp-vec" /> is a simple wrapper over a <code>PinnedVec</code>.
-                    It only adds the capability to push to the vector with an immutable reference, as demonstrated below.
+                    <code>ImpVec</code> is a simple wrapper over a <code>PinnedVec</code>.
+                    It only adds the capability to push to the vector with an immutable reference.
+                </p>
+
+                <p>
+                    You may see below the feature that <code>ImpVec</code> adds to pinned vectors.
                 </p>
 
                 <Code code={codeImpVecDemo} />
@@ -330,7 +356,7 @@ const Content = () => {
                 </p>
 
                 <p>
-                    You may see the solution with the <code>ImpVec</code> in the following code block or in the&nbsp;
+                    You may see the solution using <code>ImpVec</code> in the following code block or in the&nbsp;
                     <Link text="vector_var_imp_vec.rs" href="https://github.com/orxfun/orx-imp-vec/blob/main/examples/vector_var_imp_vec.rs" /> example file.
                 </p>
 
@@ -340,27 +366,29 @@ const Content = () => {
                     Note that we only made two changes:
                 </p>
 
-                <div className="boxes-flow">
-                    <div className="box">
+                <div className="seq">
+                    <p>
                         We changed the type of our cache from <code>UnsafeCell&lt;Vec&lt;Var&lt;'a&gt;&gt;&gt;</code> to <code>ImpVec&lt;Var&lt;'a&gt;&gt;</code>
-                    </div>
+                    </p>
 
-                    <div className="box">
+                    <p>
                         We replaced the unsafe code in the <code>index</code> method with the safe <code>imp_push_get_ref</code> method of the <code>ImpVec</code>
-                    </div>
+                    </p>
                 </div>
 
                 <p className="side-note">
-                    Note that <code>vec.imp_push_get_ref(value)</code> is simply a shorthand for the common use pattern of
+                    <code>vec.imp_push_get_ref(value)</code> function is simply a shorthand for the common use pattern of
                     the <code>vec.imp_push(value);</code> call followed by <code>&vec[vec.len() - 1]</code>.
                 </p>
 
                 <p>
-                    Now <strong>miri</strong> is happy, so we are.
+                    Now <strong>miri</strong> is happy, so we are
+                    <span className="tick" />
                 </p>
 
                 <p>
-                    Implementation will be much cleaner once we have <code>IndexGet</code>, until then we can safely cache with imp vec 👿.
+                    Implementation will be much cleaner once we have <code>IndexGet</code>.
+                    Until then we can safely cache with <code>ImpVec</code> 👿
                 </p>
 
             </section>
@@ -369,15 +397,28 @@ const Content = () => {
                 <h2>The Goal ?</h2>
 
                 <p>
-                    While trying to have the desired expressive api for my use case,
-                    I dived into pinned elements which led to <code>PinnedVec</code> and <code>ImpVec</code>.
-                    Pinned elements turned out to be useful for other data structures as well.
-                    Especially for self-referential data structures, concurrent collections and parallel processing.
-                    So I had to diverge a bit more :)
+                    While waiting for <code>IndexGet</code>, caching with <code>ImpVec</code> provided the safe workaround.
+                    This solved the biggest challenge in achieving the desired syntax.
+                    Next steps to build the mathematical programming crate are straightforward;
+                    however, one thing led to another :)
+                </p>
+
+                <p>
+                    <code>ImpVec</code> relies on pinned position guarantee of the underlying <code>PinnedVec</code>.
+                    It turns out, working with pinned elements is convenient and useful for various other things.
+                    One can imagine the benefits for concurrent collections to be shared among threads.
+                    So I took a break to work on concurrent data structures, a new and exciting area for me.
+                    This path took me all the way to parallel processing.
+                    On the other hand, since pinned elements make it conveniently safe to work with references,
+                    I wanted to work on self referential data structures.
+                    As it is the tradition, I started with simpler linked lists.
+                    Now working on trees and graphs which are also very relevant and interesting for me.
                 </p>
                 <p>
-                    That happens a lot with rust, at least to me, in a fun way ❤️
-                    Converging back to the goal soon.
+                    Long story short, I diverged quite a lot from the original goal :)
+                    That happens every time with rust <img src="https://rustacean.net/assets/rustacean-orig-noshadow.png" height="20px" /> at
+                    least to me, in a surprising and fun way ❤️
+                    Nevertheless, converging back to the goal soon.
                 </p>
 
             </section>
@@ -388,7 +429,16 @@ const Content = () => {
     )
 }
 
-const codeRelevantTypes = `struct Vector {
+const codeUglySolution = `struct Expr<'a> {
+    terms: Vec<Term<'a>>,
+}
+
+struct Term<'a> {
+    coefficient: u64,
+    var: Var<'a>,
+}
+
+struct Vector {
     symbol: String,
 }
 
@@ -396,7 +446,34 @@ const codeRelevantTypes = `struct Vector {
 struct Var<'a> {
     index: usize,
     vector: &'a Vector,
-}`;
+}
+
+// demo
+
+let x = Vector {
+    symbol: "x".to_string(),
+};
+
+let term1 = Term {
+    coefficient: 3,
+    var: Var {
+        index: 0,
+        vector: &x,
+    },
+};
+
+let term2 = Term {
+    coefficient: 4,
+    var: Var {
+        index: 7,
+        vector: &x,
+    },
+};
+
+let le = Expr {
+    terms: vec![term1, term2],
+};
+`;
 
 const codeUnsafeCellVecVar = `use std::fmt::{Display, Formatter, Result};
 use std::{cell::UnsafeCell, ops::Index};

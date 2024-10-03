@@ -1,6 +1,8 @@
+import { ReactNode } from "react";
+
 type LinkProps = {
     href: string,
-    text: string,
+    text: ReactNode,
 }
 
 export const Link = ({ href, text }: LinkProps) => {
