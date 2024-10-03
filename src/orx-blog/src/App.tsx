@@ -1,9 +1,5 @@
 import { ReactNode } from "react";
-import {
-  HashRouter,
-  Route,
-  Routes,
-} from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
 import { LeftNav } from "./LeftNav";
 import { Page } from "./Page";
 import './Page.css';
@@ -29,17 +25,15 @@ function App() {
   const pageOf = (page: ReactNode) => <Page leftNav={leftNav} page={page} />;
 
   return (
-    <HashRouter basename={process.env.PUBLIC_URL}>
-      <Routes>
-        {
-          pageMetas.map(x => {
-            return (
-              <Route key={x.path} path={x.path} element={pageOf(x.page)} />
-            )
-          })
-        }
-      </Routes>
-    </HashRouter >
+    <Routes>
+      {
+        pageMetas.map(x => {
+          return (
+            <Route key={x.path} path={x.path} element={pageOf(x.page)} />
+          )
+        })
+      }
+    </Routes>
   );
 }
 

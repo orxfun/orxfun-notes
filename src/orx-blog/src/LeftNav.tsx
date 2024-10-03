@@ -1,4 +1,5 @@
 import { PageMeta } from './App';
+import { Link } from "react-router-dom";
 import './LeftNav.css'
 
 type LeftNavProps = {
@@ -9,10 +10,10 @@ export const LeftNav = ({ pageMetas }: LeftNavProps) => {
     return (
         <>
             {
-                pageMetas.map((x, i) => {
+                pageMetas.map(x => {
                     return (
                         <div className='link'>
-                            <a href={x.path} title={x.summary}>{x.title}</a>
+                            <Link key={x.path} to={x.path} title={x.summary}>{x.title}</Link>
                             <span className='date'>{x.date}</span>
                         </div>
                     )
