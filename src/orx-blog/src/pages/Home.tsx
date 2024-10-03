@@ -13,7 +13,7 @@ export const Home = ({ articles }: HomeProps) => {
         <div className='article home'>
 
             <h1 style={{ fontStyle: 'italic', fontWeight: 'normal' }}>
-                notes about <Link text="orxfun" href="https://github.com/orxfun/" /> development.
+                notes about <Link text="orxfun" href="https://github.com/orxfun/" /> development
             </h1>
 
             <div className="articles-list">
