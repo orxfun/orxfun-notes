@@ -21,7 +21,7 @@ const Content = () => {
 
             <p>
                 The title sounds like a list of unrelated topics.
-                While I was working on a completely different topic, they somehow came together and led to ImpVec.
+                As I was working on yet another unrelated topic, they came together and led to ImpVec.
             </p>
 
             <p>
@@ -36,7 +36,7 @@ const Content = () => {
                 <Link text="ConcurrentVec" href="https://crates.io/crates/orx-concurrent-vec" />,&nbsp;
                 <Link text="AppendOnlyVec" href="https://crates.io/crates/append-only-vec" /> or&nbsp;
                 <Link text="boxcar::Vec" href="https://crates.io/crates/boxcar" />;
-                an ImpVec is not meant to be shared across threads.
+                an <code>ImpVec</code> is not meant to be shared across threads.
             </p>
 
             <p>
@@ -48,7 +48,7 @@ const Content = () => {
                 <h2>The Goal</h2>
                 <p>
                     The actual goal is to create a macro-free, type-safe, concise and expressive mathematical programming crate in rust.
-                    In order to illustrate the target api and potential challenges, a linear expression is sufficient:
+                    In order to illustrate the target api and potential challenges, a linear expression will be sufficient:
                 </p>
 
                 <Code code="let le = 3 * x[0] + 4 * x[7];" />
@@ -59,8 +59,12 @@ const Content = () => {
 
                 <p>
                     Importantly note that <code>x</code> is a symbolic vector, say <code>Vector</code>, which is nothing like a
-                    materialized <code>std::vec::Vec</code>. <code>x[i]</code> still represents the i-th element of this vector, which is
-                    another symbolic type, let's call it <code>Var</code>. As a result, <code>le</code> is not an eagerly evaluated value
+                    materialized <code>std::vec::Vec</code>.
+                </p>
+
+                <p>
+                    <code>x[i]</code> still represents the i-th element of this vector, which is another symbolic type.
+                    Let's call it <code>Var</code>. As a result, <code>le</code> is not an eagerly evaluated value
                     but an expression.
                 </p>
 
@@ -109,15 +113,11 @@ const Content = () => {
                 </p>
 
                 <p>
-                    Hence, we want the opposite;
+                    Hence, we want the <span className="inline-emphasis">opposite</span>;
                     we don't want rust code that we can understand, we want rust to understand our syntax :)
                 </p>
 
                 <div className="emphasis">
-                    We want rust to understand the concise syntax we use.
-
-                    <br /><br />
-
                     The goal is to create a library that makes the following a valid rust code
 
                     <Code code="let le = 3 * x[0] + 4 * x[7];" />
@@ -198,7 +198,7 @@ const Content = () => {
                 </div>
 
                 <p>
-                    Since <code>index</code> method only requires a <code>&self</code> we would require interior mutability to cache the <code>Var</code>.
+                    Since <code>index</code> method only requires a <code>&self</code> we need to use interior mutability to cache the <code>Var</code>.
                 </p>
 
             </section>
@@ -243,8 +243,8 @@ const Content = () => {
                     </div>
 
                     <div>
-                        We do (almost) the same thing again to create <code>vars2</code> vec
-                        and we suddenly get an <span className="danger">undefined behavior</span>
+                        We do <span className="inline-emphasis">almost</span> the same thing again to create <code>vars2</code> vec
+                        and we suddenly have <span className="danger">undefined behavior</span>
                         <span className="fail" />
                     </div>
 
@@ -288,7 +288,7 @@ const Content = () => {
 
                 <p>
                     You may run the program and see that all assertions succeed and program exits normally.
-                    However, this does not prove the absence of the memory problem.
+                    This does not prove the absence of the memory problem.
                     If we keep using it, we will eventually encounter the UB.
                     Thankfully, we have <strong>miri</strong> to tell us the problem right away.
                 </p>
@@ -301,14 +301,14 @@ const Content = () => {
                     This is an interesting case because actually there exists a safe way to use the api,
                     by always using <code>x[i]</code> and never using <code>&x[i]</code>.
                     We can be careful and never encounter memory safety issues.
-                    This is of course always wrong.
-                    What matters is there exists a use pattern that leads to UB and we don't have any means
-                    to prevent the safe-looking <code>&x[i]</code> call.
+                    This is of course too optimistic to be the correct decision.
+                    What matters is, there exists a use pattern that leads to UB and we don't have any means
+                    to eliminate the innocent-looking <code>&x[i]</code> call.
                 </p>
 
                 <p>We can have a few takeaways from this attempt:</p>
                 <div className="emphasis">
-                    <p>◉ Task would be much simpler if <code>Index</code> could return a <code>Copy</code> type by value.</p>
+                    <p>◉ We could have achieved the goal much easier if <code>Index</code> could return a <code>Copy</code> type by value.</p>
                     <p>◉ Things can go wrong in many different ways in the <code>unsafe</code> land.</p>
                     <p>◉ It would be nice if memory positions of elements could remain intact.</p>
                 </div>
@@ -332,7 +332,8 @@ const Content = () => {
                 <h2>Solution with Pinned Elements and <code>ImpVec</code></h2>
 
                 <p>
-                    Back to the title to iterate the workaround
+                    Back to the title.
+                    We iterate the workaround
                     using <Link text="PinnedVec" href="https://crates.io/crates/orx-pinned-vec" />&nbsp;
                     and <Link text="ImpVec" href="https://crates.io/crates/orx-imp-vec" />.
                 </p>
@@ -347,8 +348,8 @@ const Content = () => {
                 </p>
 
                 <p>
-                    We saw that unsafe usage of interior mutability on a vec is <strong>way too powerful</strong> for our use case.
-                    It allows us to do so many wrong things.
+                    We saw that unsafe usage of interior mutability on a vec is <span className="inline-emphasis">way too powerful</span> for
+                    our use case. It allows us to do so many wrong things.
                 </p>
 
                 <p className="emphasis">
@@ -363,13 +364,15 @@ const Content = () => {
                 <Code code={codeImpVecDemo} />
 
                 <p>
-                    Here, having an immutable <code>vec</code>, we know with certainty that <code>my_ref</code> will
-                    remain valid throughout the lifetime of the <code>vec</code>.
+                    Here, having an immutable <code>vec</code>, we know with certainty that <code>my_ref</code> will&nbsp;
+                    <span className="inline-emphasis">always be valid</span> throughout the lifetime of the <code>vec</code>.
                 </p>
 
                 <p>
                     You may see the solution using <code>ImpVec</code> in the following code block or in the&nbsp;
                     <Link text="vector_var_imp_vec.rs" href="https://github.com/orxfun/orx-imp-vec/blob/main/examples/vector_var_imp_vec.rs" /> example file.
+                    And the <Link text="system_of_linear_inequalities.rs" href="https://github.com/orxfun/orx-imp-vec/blob/main/examples/system_of_linear_inequalities.rs" /> example
+                    takes the demo one step further making the simple linear expression a valid rust code while using <code>ImpVec</code> as a scope.
                 </p>
 
                 <Code code={codeImpVec} />
@@ -394,12 +397,13 @@ const Content = () => {
                 </p>
 
                 <p>
-                    Now <strong>miri</strong> is happy, so we are
+                    Now <strong>miri</strong> is happy, we are happy
                     <span className="tick" />
                 </p>
 
                 <p>
-                    Implementation will be much cleaner once we have the rust-lang issue fixed, maybe with <code>IndexGet</code>.
+                    Solution will be cleaner once we have the rust-lang issue fixed,
+                    maybe with <code>IndexGet</code> trait.
                     Until then we can safely cache with <code>ImpVec</code> 👿
                 </p>
 
@@ -409,19 +413,19 @@ const Content = () => {
                 <h2>The Goal ?</h2>
 
                 <p>
-                    Waiting for <code>IndexGet</code>, caching with <code>ImpVec</code> provided the safe workaround.
-                    This solved the biggest challenge in achieving the desired syntax.
+                    Waiting for <code>IndexGet</code>, caching with <code>ImpVec</code> provided the safe workaround
+                    and solved the biggest challenge in achieving the desired syntax.
                     Next steps to build the mathematical programming crate are straightforward;
                     however, one thing led to another and I got distracted :)
                 </p>
 
                 <p>
                     <code>ImpVec</code> relies on pinned position guarantee of the underlying <code>PinnedVec</code>.
-                    It turns out, working with pinned elements is convenient and useful for various other things.
+                    It turns out, working with pinned elements is useful for various other things.
                     One can imagine the benefits for concurrent collections that will be shared among threads.
                     We can hang on to references of elements knowing that they will be valid
                     even though another thread is pushing new elements to the collection.
-                    So I starting working on concurrent data structures which is going all the way to parallel processing.
+                    I starting working on concurrent data structures on a path going all the way to parallel processing.
                     On a separate path, I wanted to experiment with self referential data structures
                     since pinned elements make it conveniently safe to work with references.
                     As it is the tradition, I started with linked lists and now moving towards trees and graphs.
