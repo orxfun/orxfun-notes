@@ -95,7 +95,7 @@ const Content = () => {
                 </div>
 
                 <p>
-                    The easiest way to demonstrate the target syntax is to look at what <span className="inline-emphasis">we do not want</span> :)
+                    The easiest way to demonstrate the target syntax is to look at what we <span className="inline-emphasis">don't</span> want.
                 </p>
 
                 <Code code={codeUglySolution} />
@@ -103,14 +103,14 @@ const Content = () => {
                 <p>
                     This is a nice and clean rust code.
                     We can read, follow and understand it.
-                    However, it is not immediate.
-                    Considering that we will use this library to define systems of expressions,
+                    However, seeing the expression is not immediate.
+                    Since we aim to use this library to work with systems of inequalities,
                     understanding this simple expression should have been immediate.
                 </p>
 
                 <p>
-                    Hence, this is the opposite of the desired solution.
-                    We don't want rust code that we can understand, we want rust to understand our syntax :)
+                    Hence, we want the opposite;
+                    we don't want rust code that we can understand, we want rust to understand our syntax :)
                 </p>
 
                 <div className="emphasis">
@@ -122,7 +122,7 @@ const Content = () => {
 
                     <Code code="let le = 3 * x[0] + 4 * x[7];" />
 
-                    which is not longer and not more verbose than on-paper version.
+                    which is not longer and not more verbose than on paper version.
                 </div>
 
             </section>
@@ -421,16 +421,14 @@ const Content = () => {
                     One can imagine the benefits for concurrent collections that will be shared among threads.
                     We can hang on to references of elements knowing that they will be valid
                     even though another thread is pushing new elements to the collection.
-                    So I starting working on concurrent data structures
-                    and this path is taking me all the way to parallel processing.
+                    So I starting working on concurrent data structures which is going all the way to parallel processing.
                     On a separate path, I wanted to experiment with self referential data structures
                     since pinned elements make it conveniently safe to work with references.
-                    As it is the tradition, I started with linked lists and moving towards trees and graphs.
+                    As it is the tradition, I started with linked lists and now moving towards trees and graphs.
                 </p>
                 <p>
-                    Long story short, I am taking a lot of fun side steps.
-                    Happens every time with rust ❤️<img src="https://rustacean.net/assets/rustacean-orig-noshadow.png" height="15px" /> at
-                    least to me.
+                    Long story short, I am taking a lot of fun side steps,
+                    happens every time ❤️<img src="https://rustacean.net/assets/rustacean-orig-noshadow.png" height="15px" />.
                     Original goal to be revisited soon.
                 </p>
 
