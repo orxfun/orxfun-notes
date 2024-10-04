@@ -431,9 +431,8 @@ const Content = () => {
                     As it is the tradition, I started with linked lists and now moving towards trees and graphs.
                 </p>
                 <p>
-                    Long story short, I am taking a lot of fun side steps,
-                    happens every time ❤️<img src="https://rustacean.net/assets/rustacean-orig-noshadow.png" height="15px" />.
-                    Original goal to be revisited soon.
+                    Long story short, I am taking a lot of fun side steps ❤️<img src="https://rustacean.net/assets/rustacean-orig-noshadow.png" height="15px" />&nbsp;
+                    original goal to be revisited soon.
                 </p>
 
             </section>

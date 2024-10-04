@@ -3,7 +3,7 @@ import { Link } from "../articles/Link"
 
 export const Top = () => {
 
-    const imgHeight = 15;
+    const imgHeight = 10;
 
     const imgIn = <img
         src="https://content.linkedin.com/content/dam/me/business/en-us/amp/brand-site/v2/bg/LI-Bug.svg.original.svg"
@@ -30,7 +30,7 @@ export const Top = () => {
     );
 
     const imgHome = (
-        <span style={{ color: '#264d00', fontWeight: 'x-bold' }}>
+        <span style={{ color: '#264d00', fontWeight: 'x-bold', fontSize: '1.2rem' }}>
             🏠
         </span>
     );
