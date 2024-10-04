@@ -431,7 +431,7 @@ const Content = () => {
                     Long story short, I am taking a lot of fun side steps.
                     Happens every time with rust ❤️<img src="https://rustacean.net/assets/rustacean-orig-noshadow.png" height="15px" /> at
                     least to me.
-                    To return to the original goal soon.
+                    Original goal to be revisited soon.
                 </p>
 
             </section>
