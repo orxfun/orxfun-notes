@@ -308,7 +308,7 @@ const Content = () => {
 
                 <p>We can have a few takeaways from this attempt:</p>
                 <div className="emphasis">
-                    <p>◉ We could have achieved the goal much easier if <code>Index</code> could return a <code>Copy</code> type by value.</p>
+                    <p>◉ Solution would be much simpler and cleaner if <code>Index</code> could return a <code>Copy</code> type by value.</p>
                     <p>◉ Things can go wrong in many different ways in the <code>unsafe</code> land.</p>
                     <p>◉ It would be nice if memory positions of elements could remain intact.</p>
                 </div>
@@ -323,7 +323,7 @@ const Content = () => {
                     of the <code>Index</code> trait.
                     It is closely related and there are several very common use cases discussed in the issue.
                     Recommended <code>IndexGet</code> extension seems to be promising to solve the problem discussed here, and many others.
-                    Watching closely :)
+                    Watching closely 👀
                 </p>
 
             </section>
@@ -358,7 +358,7 @@ const Content = () => {
                 </p>
 
                 <p>
-                    You may see below the feature that <code>ImpVec</code> adds to pinned vectors.
+                    The feature that <code>ImpVec</code> adds to pinned vectors is demonstrated below.
                 </p>
 
                 <Code code={codeImpVecDemo} />
