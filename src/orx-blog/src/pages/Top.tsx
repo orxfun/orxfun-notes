@@ -35,10 +35,6 @@ export const Top = () => {
         </span>
     );
 
-    const verticalBar = (
-        <span style={{ backgroundColor: 'black', width: '1rem', margin: '0 1.0rem' }}>&nbsp;</span>
-    );
-
     return (
         <div className='top'>
 
@@ -46,29 +42,32 @@ export const Top = () => {
                 text={imgHome}
                 href={process.env.PUBLIC_URL}
                 target={"page"}
+                tooltip='home'
             />
 
-            <span>{verticalBar}</span>
+            <div className='top-separator'>&nbsp;</div>
 
-            <Link
-                text={imgGitHub}
-                href="https://github.com/orxfun/"
-            />
+            <div className='top-links'>
+                <Link
+                    text={imgGitHub}
+                    href="https://github.com/orxfun/"
+                />
 
-            <Link
-                text={imgEmail}
-                href="mailto:orx.ugur.arikan@gmail.com"
-            />
+                <Link
+                    text={imgEmail}
+                    href="mailto:orx.ugur.arikan@gmail.com"
+                />
 
-            <Link
-                text={imgIn}
-                href="https://www.linkedin.com/in/uarikan/"
-            />
+                <Link
+                    text={imgIn}
+                    href="https://www.linkedin.com/in/uarikan/"
+                />
 
-            <Link
-                text={imgX}
-                href="https://twitter.com/ugur_orx"
-            />
+                <Link
+                    text={imgX}
+                    href="https://twitter.com/ugur_orx"
+                />
+            </div>
         </div>
     );
 }

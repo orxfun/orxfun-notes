@@ -95,7 +95,7 @@ const Content = () => {
                 </div>
 
                 <p>
-                    The easiest way to demonstrate the target syntax is to look at what we certainly do not want:)
+                    The easiest way to demonstrate the target syntax is to look at what <span className="inline-emphasis">we do not want</span> :)
                 </p>
 
                 <Code code={codeUglySolution} />

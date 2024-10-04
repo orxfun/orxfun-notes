@@ -41,14 +41,21 @@
     font-size: smaller;
 }
 
-
 .article a,
 .article a:visited,
 .article a:link,
 .article a:hover,
 .article a:active {
-    color: yellow;
+    font-weight: bold;
+    color: #ff9900;
     text-decoration: none;
+}
+
+.article a:hover {
+    font-weight: bold;
+    color: #ff3300;
+    text-decoration: underline;
+    transition: 0.2s all ease-in;
 }
 
 .article p code,
@@ -145,4 +152,10 @@
 
 .article .danger {
     color: #ff1a1a;
+}
+
+.article .inline-emphasis {
+    color: rgb(200, 230, 250);
+    font-weight: bold;
+    text-shadow: 0 1px 0 rgb(75, 75, 75);
 }
