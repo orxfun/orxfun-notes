@@ -48,7 +48,7 @@ const Content = () => {
                 <h2>The Goal</h2>
                 <p>
                     The actual goal is to create a macro-free, type-safe, concise and expressive mathematical programming crate in rust.
-                    In order to illustrate the targeted api and potential challenges, a linear expression is sufficient:
+                    In order to illustrate the target api and potential challenges, a linear expression is sufficient:
                 </p>
 
                 <Code code="let le = 3 * x[0] + 4 * x[7];" />
@@ -96,25 +96,25 @@ const Content = () => {
 
                 <p>
                     The easiest way to demonstrate the target syntax is to look at what we certainly do not want:)
-                    Absolute opposite of the desired solution is demonstrated in the following code block:
                 </p>
 
                 <Code code={codeUglySolution} />
 
                 <p>
-                    Note that this is a simple and nice rust code.
+                    This is a nice and clean rust code.
                     We can read, follow and understand it.
                     However, it is not immediate.
-                    Understanding this simple expression should have been immediate.
-                    So with this syntax, we'd have no luck when we work with a system of inequalities.
+                    Considering that we will use this library to define systems of expressions,
+                    understanding this simple expression should have been immediate.
                 </p>
 
                 <p>
-                    This initial attempt sets the motivation of the desired crate.
+                    Hence, this is the opposite of the desired solution.
+                    We don't want rust code that we can understand, we want rust to understand our syntax :)
                 </p>
 
                 <div className="emphasis">
-                    We want rust to understand the syntax we use.
+                    We want rust to understand the concise syntax we use.
 
                     <br /><br />
 
@@ -147,7 +147,7 @@ const Content = () => {
                 </p>
 
                 <p>
-                    The problem we have here is actually common and can be summarized as follows:
+                    The problem we have here is a familiar one and can be summarized as follows:
                 </p>
 
                 <div className="seq">
@@ -156,7 +156,7 @@ const Content = () => {
                     </div>
 
                     <div>
-                        We couldn't store even if we wanted since there are infinitely many <code>Var</code>s.
+                        We couldn't store even if we wanted to since there are infinitely many of them.
                     </div>
 
                     <div>
@@ -187,7 +187,7 @@ const Content = () => {
                 </div>
 
                 <p>
-                    We can have a workaround as follows to solve our problem:
+                    The following workaround might solve our problem:
                 </p>
 
                 <div className="seq">
@@ -198,7 +198,7 @@ const Content = () => {
                 </div>
 
                 <p>
-                    Since <code>index</code> method only requires a <code>&self</code> we would require <strong>interior mutability</strong> to store the <code>Var</code>.
+                    Since <code>index</code> method only requires a <code>&self</code> we would require interior mutability to cache the <code>Var</code>.
                 </p>
 
             </section>
@@ -207,12 +207,12 @@ const Content = () => {
                 <h2>Solution Attempt with <code>UnsafeCell&lt;Vec&lt;Var&lt;'_&gt;&gt;&gt;</code></h2>
 
                 <p>
-                    A straightforward approach is to use <code>UnsafeCell&lt;Vec&lt;Var&lt;'_&gt;&gt;&gt;</code> to cache the variables that we create.
+                    A straightforward approach is to use <code>UnsafeCell&lt;Vec&lt;Var&lt;'_&gt;&gt;&gt;</code> to cache the variables that we create on demand.
                 </p>
 
                 <p className="side-note">
                     The cache will keep growing; however, this is insignificant for the use case.
-                    We will represent systems of arbitrary sizes with several expressions.
+                    We will represent systems of arbitrary sizes with several symbolic expressions.
                 </p>
 
                 <p>
@@ -227,24 +227,28 @@ const Content = () => {
                     Then, we push it to <code>created_vars</code> vector and return a reference to it.
                 </p>
 
-                <p>
-                    In the demo, we create the vector <code>x</code> and create a <code>Var</code> out of it by calling <code>x[0]</code>.
-                    We don't need to use <code>&x[0]</code> since <code>Var</code> implements <code>Copy</code>.
-                    The assertion passes, all good
-                    <span className="tick" />
-                </p>
+                <p>In the demo:</p>
+                <div className="seq">
+                    <div>
+                        We create the vector <code>x</code> and create a <code>Var</code> out of it by calling <code>x[0]</code>.
+                        We don't need to use <code>&x[0]</code> since <code>Var</code> implements <code>Copy</code>.
+                        The assertion passes, all good
+                        <span className="tick" />
+                    </div>
 
-                <p>
-                    To test it a little further, we create a thousand vars and collect them in <code>vars1</code> vec.
-                    We test them one by one, all succeed
-                    <span className="tick" />
-                </p>
+                    <div>
+                        To test it a little further, we create a thousand vars and collect them in <code>vars1</code> vec.
+                        We test them one by one, all succeed
+                        <span className="tick" />
+                    </div>
 
-                <p>
-                    We do (almost) the same thing again to create <code>vars2</code> vec
-                    and we suddenly get an <span className="danger">undefined behavior</span>
-                    <span className="fail" />
-                </p>
+                    <div>
+                        We do (almost) the same thing again to create <code>vars2</code> vec
+                        and we suddenly get an <span className="danger">undefined behavior</span>
+                        <span className="fail" />
+                    </div>
+
+                </div>
 
                 <div className="emphasis">
                     <p>
@@ -253,13 +257,14 @@ const Content = () => {
                 </div>
 
                 <p>
-                    The problem might be immediately clear for some,
-                    and it might be a bit hidden for others.
+                    The problem might be immediately clear for some
+                    but it might be a bit hidden for others.
+                    Zooming in the types of the vectors reveals the problem.
                 </p>
 
                 <div className="boxes">
                     <div className="box">
-                        <code>let vars1: Vec&lt;Var&gt;</code>
+                        <code>vars1: Vec&lt;Var&gt;</code>
                         <div className="hor-line" />
                         <p><code>index</code> operator returns <code>&Var</code></p>
                         <p>we copy and store the variable as an owned <code>Var</code></p>
@@ -267,7 +272,7 @@ const Content = () => {
                     </div>
 
                     <div className="box">
-                        <code>let vars2: Vec&lt;&Var&gt;</code>
+                        <code>vars2: Vec&lt;&Var&gt;</code>
                         <div className="hor-line" />
                         <p>here, we don't copy</p>
                         <p>we directly store returned references in our vector</p>
@@ -285,9 +290,6 @@ const Content = () => {
                     You may run the program and see that all assertions succeed and program exits normally.
                     However, this does not prove the absence of the memory problem.
                     If we keep using it, we will eventually encounter the UB.
-                </p>
-
-                <p>
                     Thankfully, we have <strong>miri</strong> to tell us the problem right away.
                 </p>
 
@@ -295,10 +297,19 @@ const Content = () => {
                 <br />
                 <code className="danger">constructing invalid value: encountered a dangling reference (use-after-free)</code>
 
+                <p>
+                    This is an interesting case because actually there exists a safe way to use the api,
+                    by always using <code>x[i]</code> and never using <code>&x[i]</code>.
+                    We can be careful and never encounter memory safety issues.
+                    This is of course always wrong.
+                    What matters is there exists a use pattern that leads to UB and we don't have any means
+                    to prevent the safe-looking <code>&x[i]</code> call.
+                </p>
+
                 <p>We can have a few takeaways from this attempt:</p>
                 <div className="emphasis">
                     <p>◉ Task would be much simpler if <code>Index</code> could return a <code>Copy</code> type by value.</p>
-                    <p>◉ Things can go wrong in various ways in the <code>unsafe</code> land.</p>
+                    <p>◉ Things can go wrong in many different ways in the <code>unsafe</code> land.</p>
                     <p>◉ It would be nice if memory positions of elements could remain intact.</p>
                 </div>
 
@@ -369,17 +380,17 @@ const Content = () => {
 
                 <div className="seq">
                     <div>
-                        We changed the type of our cache from <code>UnsafeCell&lt;Vec&lt;Var&lt;'a&gt;&gt;&gt;</code> to <code>ImpVec&lt;Var&lt;'a&gt;&gt;</code>
+                        We changed the type of our cache from <code>UnsafeCell&lt;Vec&lt;Var&lt;'a&gt;&gt;&gt;</code> to <code>ImpVec&lt;Var&lt;'a&gt;&gt;</code>.
                     </div>
 
                     <div>
-                        We replaced the unsafe code in the <code>index</code> method with the safe <code>imp_push_get_ref</code> method of the <code>ImpVec</code>
+                        We replaced the unsafe code in the <code>index</code> method with the safe <code>imp_push_get_ref</code> method of the <code>ImpVec</code>.
                     </div>
                 </div>
 
                 <p className="side-note">
                     <code>vec.imp_push_get_ref(value)</code> function is simply a shorthand for the common use pattern of
-                    the <code>vec.imp_push(value);</code> call followed by <code>&vec[vec.len() - 1]</code>.
+                    the <code>vec.imp_push(value)</code> call followed by <code>&vec[vec.len() - 1]</code>.
                 </p>
 
                 <p>
@@ -388,7 +399,7 @@ const Content = () => {
                 </p>
 
                 <p>
-                    Implementation will be much cleaner once we have <code>IndexGet</code>.
+                    Implementation will be much cleaner once we have the rust-lang issue fixed, maybe with <code>IndexGet</code>.
                     Until then we can safely cache with <code>ImpVec</code> 👿
                 </p>
 
@@ -398,28 +409,29 @@ const Content = () => {
                 <h2>The Goal ?</h2>
 
                 <p>
-                    While waiting for <code>IndexGet</code>, caching with <code>ImpVec</code> provided the safe workaround.
+                    Waiting for <code>IndexGet</code>, caching with <code>ImpVec</code> provided the safe workaround.
                     This solved the biggest challenge in achieving the desired syntax.
                     Next steps to build the mathematical programming crate are straightforward;
-                    however, one thing led to another :)
+                    however, one thing led to another and I got distracted :)
                 </p>
 
                 <p>
                     <code>ImpVec</code> relies on pinned position guarantee of the underlying <code>PinnedVec</code>.
                     It turns out, working with pinned elements is convenient and useful for various other things.
-                    One can imagine the benefits for concurrent collections to be shared among threads.
-                    So I took a break to work on concurrent data structures, a new and exciting area for me.
-                    This path took me all the way to parallel processing.
-                    On the other hand, since pinned elements make it conveniently safe to work with references,
-                    I wanted to work on self referential data structures.
-                    As it is the tradition, I started with simpler linked lists.
-                    Now working on trees and graphs which are also very relevant and interesting for me.
+                    One can imagine the benefits for concurrent collections that will be shared among threads.
+                    We can hang on to references of elements knowing that they will be valid
+                    even though another thread is pushing new elements to the collection.
+                    So I starting working on concurrent data structures
+                    and this path is taking me all the way to parallel processing.
+                    On a separate path, I wanted to experiment with self referential data structures
+                    since pinned elements make it conveniently safe to work with references.
+                    As it is the tradition, I started with linked lists and moving towards trees and graphs.
                 </p>
                 <p>
-                    Long story short, I diverged quite a lot from the original goal :)
-                    That happens every time with rust <img src="https://rustacean.net/assets/rustacean-orig-noshadow.png" height="20px" /> at
-                    least to me, in a surprising and fun way ❤️
-                    Nevertheless, converging back to the goal soon.
+                    Long story short, I am taking a lot of fun side steps.
+                    Happens every time with rust ❤️<img src="https://rustacean.net/assets/rustacean-orig-noshadow.png" height="15px" /> at
+                    least to me.
+                    To return to the original goal soon.
                 </p>
 
             </section>
