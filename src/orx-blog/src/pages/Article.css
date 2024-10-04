@@ -6,9 +6,8 @@
 
 .article {
     color: white;
-    padding: 0;
+    padding: 0 1rem;
     font-size: 1.0rem;
-    text-align: justify;
     overflow-y: auto;
     width: 100%;
     height: calc(100vh - 3rem);
@@ -64,8 +63,8 @@
 .article .emphasis {
     text-align: center;
     padding: 0.5rem 0.5rem;
-    border-left: 3px solid #4d3d00;
-    border-right: 3px solid #4d3d00;
+    border-left: 0.4rem solid var(--color-emphasis);
+    border-right: 0.1rem solid var(--color-emphasis);
     color: var(--color-emphasis);
 }
 
@@ -88,8 +87,8 @@
 
 .article .boxes {
     display: flex;
-    gap: 0.4rem;
-    width: 95%;
+    gap: 0.7rem;
+    padding: 0 1.5rem;
 }
 
 .article .box {
@@ -121,11 +120,11 @@
 }
 
 .article .seq div::before {
-    content: '⮩ ';
+    content: '↪ ';
     color: var(--color-emphasis);
 }
 
-
+/* 
 .article .seq div:nth-child(2) {
     padding-left: calc(1 * 0.9rem);
 }
@@ -160,7 +159,7 @@
 
 .article .seq div:nth-child(10) {
     padding-left: calc(9 * 0.9rem);
-}
+} */
 
 .article .tick::before {
     content: ' ✓ ';

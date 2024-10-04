@@ -529,7 +529,7 @@ let x = &Vector::new("x");
 let x0: Var = x[0];
 assert_eq!(x0.to_string(), "x[0]");
 
-// still good
+// also good
 
 let vars1: Vec<_> = (0..1000).map(|i| x[i]).collect();
 
@@ -571,12 +571,7 @@ struct Vector<'a> {
 }
 
 impl<'a> Vector<'a> {
-    fn new(symbol: &str) -> Self {
-        Self {
-            symbol: symbol.into(),
-            created_vars: Default::default(),
-        }
-    }
+    fn new(symbol: &str) -> Self { /* same as before */ }
 }
 
 impl<'a> Index<usize> for &'a Vector<'a> {
@@ -592,16 +587,11 @@ impl<'a> Index<usize> for &'a Vector<'a> {
 }
 
 #[derive(Clone, Copy)]
-struct Var<'a> {
-    vector: &'a Vector<'a>,
-    index: usize,
-}
+struct Var<'a>  { /* same as before */ }
 
-impl<'a> Display for Var<'a> {
-    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
-        write!(f, "{}[{}]", &self.vector.symbol, self.index)
-    }
-}
+impl<'a> Display for Var<'a> { /* same as before */ }
+
+// demo
 
 let x = &Vector::new("x");
 
@@ -610,7 +600,7 @@ let x = &Vector::new("x");
 let x0: Var = x[0];
 assert_eq!(x0.to_string(), "x[0]");
 
-// still good
+// also good
 
 let vars1: Vec<Var> = (0..1000).map(|i| x[i]).collect();
 
@@ -618,7 +608,7 @@ for (i, x) in vars1.iter().enumerate() {
     assert_eq!(x.to_string(), format!("x[{}]", i));
 }
 
-// also good
+// still good
 
 let vars2: Vec<&Var> = (0..1000).map(|i| &x[i]).collect();
 
