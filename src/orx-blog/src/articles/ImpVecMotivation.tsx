@@ -414,24 +414,24 @@ const Content = () => {
 
                 <p>
                     Waiting for <code>IndexGet</code>, caching with <code>ImpVec</code> provided the safe workaround
-                    and solved the biggest challenge in achieving the desired syntax.
+                    to achieve the desired syntax.
                     Next steps to build the mathematical programming crate are straightforward;
-                    however, one thing led to another and I got distracted :)
+                    however, one thing led to another and got distracted :)
                 </p>
 
                 <p>
                     <code>ImpVec</code> relies on pinned position guarantee of the underlying <code>PinnedVec</code>.
                     It turns out, working with pinned elements is useful for various other things.
                     One can imagine the benefits for concurrent collections that will be shared among threads.
-                    We can hang on to references of elements knowing that they will be valid
+                    We can hang onto references of elements knowing that they will be valid
                     even though another thread is pushing new elements to the collection.
-                    I starting working on concurrent data structures on a path going all the way to parallel processing.
+                    So started working on concurrent data structures on a path going all the way to parallel processing.
                     On a separate path, I wanted to experiment with self referential data structures
                     since pinned elements make it conveniently safe to work with references.
-                    As it is the tradition, I started with linked lists and now moving towards trees and graphs.
+                    Started with linked lists as it is the tradition, and now moving towards trees and graphs.
                 </p>
                 <p>
-                    Long story short, I am taking a lot of fun side steps ❤️<img src="https://rustacean.net/assets/rustacean-orig-noshadow.png" height="15px" />&nbsp;
+                    In brief, I am taking a lot of fun side steps ❤️<img src="https://rustacean.net/assets/rustacean-orig-noshadow.png" height="15px" /> but
                     original goal to be revisited soon.
                 </p>
 
