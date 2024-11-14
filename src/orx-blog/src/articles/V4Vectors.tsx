@@ -21,11 +21,12 @@ const Content = () => {
 
             <p>
                 I am frequently working algorithms, mainly on optimization algorithms.
-                And rust is a wonderful language for the purpose ❤️<img src="https://rustacean.net/assets/rustacean-orig-noshadow.png" height="15px" />.
+                With a great type system and monomorphization, rust is a wonderful language for this
+                purpose ❤️<img src="https://rustacean.net/assets/rustacean-orig-noshadow.png" height="15px" />.
             </p>
 
             <p>
-                Vectors are of course the most commonly used collection.
+                Vectors are naturally the most commonly used collection.
                 We often need a one dimensional vector (<code>V1</code>), sometimes a matrix (<code>Matrix</code>)
                 or a more general jagged two dimensional vector (<code>V2</code>), and less frequently but sometimes
                 a higher dimensional vector.
