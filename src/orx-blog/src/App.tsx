@@ -5,6 +5,7 @@ import { Home } from './pages/Home';
 import './Page.css';
 import { Top } from "./pages/Top";
 import { Page } from "./Page";
+import { PageMetaV4Vectors } from "./articles/V4Vectors";
 
 export type PageMeta = {
   path: string,
@@ -18,6 +19,7 @@ function App() {
 
   const articles: PageMeta[] = [
     PageMetaImpVecMotivation(),
+    PageMetaV4Vectors(),
   ];
 
   const top = <Top />;
