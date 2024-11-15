@@ -7,6 +7,8 @@ type ArticleProps = {
 
 export const Article = ({ content }: ArticleProps) => {
     return (
-        <div className='article'>{content}</div>
+        <div className='article'>
+            {content}
+        </div>
     )
 }

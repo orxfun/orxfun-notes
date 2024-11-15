@@ -20,18 +20,25 @@
 .home .articles-list {
     max-height: calc(100vh - 14rem);
     overflow-y: auto;
+    display: grid;
+    grid-template-columns: auto;
+    align-content: start;
+    gap: 1.5rem;
 }
 
-.home .articles-list .link {
+.home .articles-list .link-block {
+    display: block;
+}
+
+.home .articles-list .link-block .link {
     display: grid;
     grid-template-columns: auto 6rem;
     gap: 0.2rem;
     padding: 0 1rem;
     line-height: 1rem;
     max-height: 2rem;
-
 }
 
-.home .articles-list .link .date {
+.home .articles-list .link-block .link .date {
     text-align: right;
 }

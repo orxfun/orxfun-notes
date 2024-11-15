@@ -18,8 +18,8 @@ export type PageMeta = {
 function App() {
 
   const articles: PageMeta[] = [
-    PageMetaImpVecMotivation(),
     PageMetaVForVectors(),
+    PageMetaImpVecMotivation(),
   ];
 
   const top = <Top />;

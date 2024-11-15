@@ -20,9 +20,11 @@ export const Home = ({ articles }: HomeProps) => {
                 {
                     articles.map(x => {
                         return (
-                            <div className='link'>
-                                <RouteLink key={x.path} to={x.path} title={x.summary}>{x.title}</RouteLink>
-                                <span className='date'>{x.date}</span>
+                            <div className="link-block" key={x.path}>
+                                <div className='link'>
+                                    <RouteLink to={x.path} title={x.summary}>{x.title}</RouteLink>
+                                    <span className='date'>{x.date}</span>
+                                </div>
                             </div>
                         )
                     })

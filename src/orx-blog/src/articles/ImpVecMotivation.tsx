@@ -5,7 +5,7 @@ import { Link } from "./Link";
 const path = '/imp-vec-motivation-2024-10-03';
 const title = 'Index Trait, Pinned Elements and Immutable Push Vector';
 const date = '2024-10-03';
-const summary = 'The motivation behind the ImpVec.'
+const summary = 'motivation behind the ImpVec'
 
 export const PageMetaImpVecMotivation = () => {
     const content = <Content />;
@@ -18,6 +18,7 @@ const Content = () => {
         <>
             <h1>{title}</h1>
             <span className="date">{date}</span>
+            <span className="date">{summary}</span>
 
             <p>
                 The title sounds like a list of unrelated topics.
