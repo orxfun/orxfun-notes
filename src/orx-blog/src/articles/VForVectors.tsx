@@ -166,6 +166,9 @@ const Content = () => {
 
                 <p>
                     This observation sets the target.
+                </p>
+
+                <p style={{ textAlign: "center", fontWeight: "bold" }}>
                     We need the copies of the algorithm, made by the compiler of course.
                     Through traits, generics and monomorphization.
                 </p>
@@ -371,7 +374,27 @@ const Content = () => {
                 </p>
 
                 <p>
-                    To complete the example, let's assume that we want to be able to use our <code>algorithm</code> above
+                    Then, the goal is as follows.
+                </p>
+
+                <div className="emphasis">
+                    <p>
+                        ① We want to have a <strong>single</strong> generic implementation of the <strong>algorithm</strong> which
+                        allows all (!) concrete data types that behaves as a distance matrix.
+                    </p>
+                    <p>
+                        ② Running the algorithm with a concrete type must perform as fast as it would if we had a special implementation
+                        for this specific type.
+                    </p>
+                </div>
+
+                <p>
+                    In order to achieve this, we need to define the shared behavior of one and higher dimensional vectors as traits.
+                    The second goal will be achieved thanks to zero cost abstraction and monomorphization.
+                </p>
+
+                <p>
+                    To continue with the example, let's assume that we want to be able to use our <code>algorithm</code> above
                     with the following concrete distance matrix types that fit different situations.
                 </p>
 
@@ -405,28 +428,8 @@ const Content = () => {
                 </div>
 
                 <p className="side-note">
-                    Alternative ctor types mentioned here, such as <code>SparseVec</code>, <code>FunVec</code> and <code>CachedVec</code> are
+                    Alternative vec types mentioned here, such as <code>SparseVec</code>, <code>FunVec</code> and <code>CachedVec</code> are
                     just prototypes to demonstrate the idea of use cases requiring different kinds of vectors.
-                </p>
-
-                <p>
-                    Then, the goal is as follows.
-                </p>
-
-                <div className="emphasis">
-                    <p>
-                        ① We want to have a <strong>single</strong> generic implementation of the <strong>algorithm</strong> which
-                        allows all (!) concrete data types that behaves as a distance matrix.
-                    </p>
-                    <p>
-                        ② Running the algorithm with a concrete type must perform as fast as it would if we had a special implementation
-                        for this specific type.
-                    </p>
-                </div>
-
-                <p>
-                    In order to achieve this, we need to define the shared behavior of one and higher dimensional vectors as traits.
-                    The second goal will be achieved thanks to zero cost abstraction and monomorphization.
                 </p>
 
             </section>
@@ -605,7 +608,7 @@ const Content = () => {
                     Please feel free to open an <Link text="issue" href="https://github.com/orxfun/orx-v/issues/new" /> or create a PR
                     if you notice an error, or you think something could be improved, or you have a suggestion to extend the trait definitions with
                     additional functionalities, or you think that certain concrete types must implement the vector traits, or to discuss something.
-                    In brief, ideas and contributions are very welcome 😃
+                    In brief, ideas and contributions are very welcome (•‿•)
                 </p>
 
             </section>
@@ -700,7 +703,7 @@ fn at(&self, idx: impl IntoIdx<D>) -> T;
 /// each child of a V2 is a V1; ...
 fn child(&self, i: D::ChildIdx) -> impl NVec<D::PrevDim, T>;
 
-/// note that this is different than .iter() as it yields the
+/// this is different than .iter() as it yields the
 /// innermost scalars of the multi-dimensional vector.
 ///
 /// a length 10 V1 yields its 10 elements
