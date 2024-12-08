@@ -1,11 +1,12 @@
+import './Page.css';
 import { ReactNode } from "react";
 import { Route, Routes } from 'react-router-dom';
-import { PageMetaImpVecMotivation } from "./articles/ImpVecMotivation";
 import { Home } from './pages/Home';
-import './Page.css';
 import { Top } from "./pages/Top";
 import { Page } from "./Page";
+import { PageMetaImpVecMotivation } from "./articles/ImpVecMotivation";
 import { PageMetaVForVectors } from "./articles/VForVectors";
+import { PageMetaMissingIterableTraits } from "./articles/MissingIterableTraits";
 
 export type PageMeta = {
   path: string,
@@ -18,6 +19,7 @@ export type PageMeta = {
 function App() {
 
   const articles: PageMeta[] = [
+    PageMetaMissingIterableTraits(),
     PageMetaVForVectors(),
     PageMetaImpVecMotivation(),
   ];
