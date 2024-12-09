@@ -5,7 +5,7 @@ import { Link } from "./Link";
 const path = '/missing-iterable-traits-2024-12-13';
 const title = 'Missing Iterable Traits';
 const date = '2024-12-13';
-const summary = 'and how to effortlessly introduce them'
+const summary = 'and how to introduce them almost effortlessly'
 
 export const PageMetaMissingIterableTraits = () => {
     const content = <Content />;
@@ -200,8 +200,8 @@ const Content = () => {
                 <h3>Example: Iterable</h3>
 
                 <p>
-                    In the following example, we relax the <code>Collection</code> requirement on numbers to more general <code>Iterable</code> requirement.
-                    Notice that now we can also additionally cloneable iterators and lazy generators which do not store their elements, such as the range.
+                    In the following example, we relax the <code>Collection</code> requirement on numbers to more general <code>Iterable</code> definition.
+                    Notice that now we can also use cloneable iterators and lazy generators which do not store their elements, such as the range.
                 </p>
 
                 <Code code={exampleIterable} />
@@ -219,7 +219,8 @@ const Content = () => {
                 <Code code={collectionTraits} />
 
                 <p>
-                    Implementing these traits was not clear until I noticed the beauty of the <code>IntoIterator</code> trait.
+                    There might be several directions to go for implementing these traits.
+                    And the decision was not clear until I noticed the beauty of the <code>IntoIterator</code> trait.
                 </p>
 
                 <p>
@@ -247,11 +248,12 @@ const Content = () => {
 
                 <p>
                     This design pattern introduced by the standard library is wonderful,
-                    nicely dividing the IntoIterator behavior for collections into three implementations.
+                    nicely dividing the IntoIterator behavior for collections into three implementations:&nbsp;
+                    one for each of the <code>self</code>, <code>&self</code> and <code>&mut self</code>.
                 </p>
 
                 <p>
-                    We have everything we need for implementing both collection traits
+                    We have everything we need for implementing both of the collection traits
                     <br /><Indent />
                     for all collections
                     <br /><Indent />
@@ -266,9 +268,13 @@ const Content = () => {
 
                 <p>
                     That's all.
+                </p>
+
+                <p>
                     Collections implicitly implement the collection traits.
                     You may find <Link text="here" href="https://docs.rs/orx-iterable/latest/orx_iterable/#d-defining-new-custom-collections" />&nbsp;
-                    a guideline and examples for defining custom collections; however, in brief, all we need is not to have missing IntoIterator implementations.
+                    a guideline and examples for defining custom collections; however, in brief, all we need to do is to have the relevant
+                    IntoIterator implementations.
                 </p>
 
             </section>

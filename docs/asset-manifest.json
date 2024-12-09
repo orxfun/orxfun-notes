@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/orxfun-notes/static/css/main.cb1dba0c.css",
-    "main.js": "/orxfun-notes/static/js/main.63ae7b83.js",
+    "main.js": "/orxfun-notes/static/js/main.8229f90e.js",
     "static/js/453.ab70bf71.chunk.js": "/orxfun-notes/static/js/453.ab70bf71.chunk.js",
     "index.html": "/orxfun-notes/index.html",
     "main.cb1dba0c.css.map": "/orxfun-notes/static/css/main.cb1dba0c.css.map",
-    "main.63ae7b83.js.map": "/orxfun-notes/static/js/main.63ae7b83.js.map",
+    "main.8229f90e.js.map": "/orxfun-notes/static/js/main.8229f90e.js.map",
     "453.ab70bf71.chunk.js.map": "/orxfun-notes/static/js/453.ab70bf71.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.cb1dba0c.css",
-    "static/js/main.63ae7b83.js"
+    "static/js/main.8229f90e.js"
   ]
 }
