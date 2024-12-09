@@ -401,12 +401,39 @@ const Content = () => {
                 </div>
 
                 <p>
-                    Lastly, it was a very happy moment to see that the traits are automatically implemented by <code>SmallVec</code>,
+                    Lastly, to use the traits, there are only two simple guidelines you might check:
+                </p>
+                <ul>
+                    <li>
+                        <Link text="creating a new Collection" href="https://docs.rs/orx-iterable/latest/orx_iterable/#d-defining-new-custom-collections" />&nbsp;
+                        =&gt; actually no care is needed as long as we do not have missing <code>IntoIterator</code> implementations.
+                    </li>
+                    <li>
+                        <Link text="implementing a custom Iterable" href="https://docs.rs/orx-iterable/latest/orx_iterable/#b3-lazy-generators" />&nbsp;
+                        =&gt; no different than implementing any trait.
+                    </li>
+                </ul>
+
+                <p>
+                    It was a very happy moment to see that the traits are automatically implemented by <code>SmallVec</code>,
                     which was the first out-of-std collection I tried.
-                    This is probably the nicest result; these traits are and will be implicitly implemented for custom or specialized
-                    collections as long as we do not have missing <code>IntoIterator</code> implementations.
                 </p>
 
+                <p>
+                    This is probably the nicest result.
+                </p>
+
+                <div className="seq">
+                    <div>
+                        Iterable, Collection and CollectionMut traits are implemented implicitly.
+                    </div>
+                    <div>
+                        They do not require to do anything differently while implementing custom collections.
+                    </div>
+                    <div>
+                        They just fit in and work.
+                    </div>
+                </div>
             </section>
 
             <div className="end-space"></div>
