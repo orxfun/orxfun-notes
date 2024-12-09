@@ -22,10 +22,6 @@ const Content = () => {
             <span className="date">{date}</span>
             <span className="date">{summary}</span>
 
-            <div className="side-note">
-                (WIP warning) still work in progress but already includes the idea
-            </div>
-
             <p>
                 This article discusses iterable and collection traits that represent types that can be iterated over repeatedly,
                 and how they are introduced almost effortlessly thanks to the powerful type system of rust.
@@ -296,15 +292,15 @@ const Content = () => {
                 <Code code={iterableTrait} />
 
                 <p>
-                    We want this trait to implicitly cover collections, as well as, cloneable iterators.
+                    We want this trait to implicitly cover (i) collections, as well as, (ii) cloneable iterators.
                 </p>
 
                 <p>
                     Furthermore, unlike the collection traits, it must be extensible.
-                    In other words, we must be able to implement iterable on any custom non-collection type, whenever it makes sense.
+                    In other words, we must be able to implement iterable on any (iii) custom non-collection type, whenever it makes sense.
                 </p>
 
-                <h3>Collections as Iterables</h3>
+                <h3>i. Collections as Iterables</h3>
 
                 <p>
                     Using our previous observation, we can easily implement iterable for references (!) of all collections.
@@ -322,7 +318,7 @@ const Content = () => {
                     Therefore, we can always provide a reference of a Collection to a function expecting an Iterable.
                 </p>
 
-                <h3>Cloneable Iterators</h3>
+                <h3>ii. Cloneable Iterators</h3>
 
                 <p>
                     An iterator is not limited to visiting elements of a collection.
@@ -351,6 +347,22 @@ const Content = () => {
                 </p>
 
                 <Code code={iterableImplForCloneableIterators} />
+
+                <h3>iii. Custom Iterables</h3>
+
+                <p>
+                    As mentioned, iterables are extensible.
+                    Whenever it makes sense, we can explicitly implement Iterable for our custom non-collection type.
+                    This fits best to lazy generator types which compute elements to be yield during iteration.
+                </p>
+
+                <p>
+                    In the following example, <code>FibUntilIter </code> is an iterator yielding Fibonacci numbers up to a limit.&nbsp;
+                    <code>FibUntil</code>, on the other hand, is capable of creating this iterator repeatedly.
+                    Therefore, it explicitly implements Iterable.
+                </p>
+
+                <Code code={iterableLazyGenerator} />
 
             </section>
 
@@ -660,6 +672,46 @@ trait IntoCloningIterable: Iterator + Clone {
 
 impl<I> IntoCloningIterable for I where I: Iterator + Clone {}
 `;
+
+const iterableLazyGenerator = `use orx_iterable::*;
+
+struct FibUntilIter {
+    curr: u32,
+    next: u32,
+    until: u32,
+}
+
+impl Iterator for FibUntilIter {
+    type Item = u32;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let current = self.curr;
+        self.curr = self.next;
+        self.next = current + self.next;
+        match current > self.until {
+            false => Some(current),
+            true => None,
+        }
+    }
+}
+
+struct FibUntil(u32);
+
+impl Iterable for FibUntil {
+    type Item = u32;
+
+    type Iter = FibUntilIter;
+
+    fn iter(&self) -> Self::Iter {
+        FibUntilIter { curr: 0, next: 1, until: self.0 }
+    }
+}
+
+let fib = FibUntil(10); // Iterable
+
+assert_eq!(fib.iter().count(), 7);
+assert_eq!(fib.iter().max(), Some(8));
+assert_eq!(fib.iter().collect::<Vec<_>>(), [0, 1, 1, 2, 3, 5, 8]);`;
 
 const iterableTransformations = `use orx_iterable::*;
 use std::collections::HashSet;
