@@ -5,7 +5,7 @@ import { Link } from "./Link";
 const path = '/missing-iterable-traits-2024-12-13';
 const title = 'Missing Iterable Traits';
 const date = '2024-12-13';
-const summary = 'and how to effortlessly introduce them for good'
+const summary = 'and how to effortlessly introduce them'
 
 export const PageMetaMissingIterableTraits = () => {
     const content = <Content />;
@@ -40,21 +40,19 @@ const Content = () => {
 
                 <p>
                     In this section, we briefly discuss what we have in the core library, namely Iterator and IntoIterator.
-                    Then, we discuss possible iterable or collection abstractions that we do not have.
+                    Then, we discuss possible iterable or collection abstractions.
                 </p>
 
                 <h3>Iterator</h3>
 
                 <p>
-                    In the core library, we have the <code>Iterator</code> trait.
+                    Luckily, we have the <code>Iterator</code> trait.
                 </p>
 
                 <p>
-                    Iterators allow to sequentially traverse elements resulting from a computation.
-                    The computation might be no-ops and we can simply iterate over elements of a collection.
-                    Or the elements might be computed in a lazy manner during iteration, one at a time whenever the iterator progresses.
-                    Or we might transform elements of a collection by a composition of functions; we often chain iterator-to-iterator methods to
-                    conveniently compose lazy computations.
+                    Iterators allow to sequentially traverse elements of a collection or elements that are created as a result of a computation.
+                    They are very general, flexible and efficient.
+                    Further, we often use and chain iterator-to-iterator transformations to conveniently compose computations over some data.
                 </p>
 
                 <div className="side-note">
@@ -73,9 +71,9 @@ const Content = () => {
                 </div>
 
                 <p>
-                    Iterators are included and widely used in many other languages, sometimes with different names
-                    such as enumerators, streams or ranges.
-                    They are everywhere and they are awesome.
+                    Iterators are included and widely used in many other languages.
+                    Although they might have different names such as enumerators or streams,
+                    they are everywhere and they are great (￣ー￣)ｂ
                 </p>
 
                 <h3>IntoIterator</h3>
@@ -89,18 +87,18 @@ const Content = () => {
                 <Code code={intoIterator} />
 
                 <p>
-                    It promises that the implementing type can be consumed and converted into an iterator yielding items of type <code>Item</code>.
+                    It promises that the implementing type can be consumed and converted into an iterator yielding elements of type <code>Item</code>.
                 </p>
 
                 <p>
-                    This is very interesting, very flexible and we will most certainly revisit.
+                    This is very interesting, very flexible and something that we will most certainly revisit.
                 </p>
 
                 <h3>Iterable & Collection Traits</h3>
 
                 <p>
                     The missing piece is the iterable and / or collection traits; i.e.,
-                    the common behavior of creating iterators repeatedly from the collection types, and maybe from other source types too.
+                    the common behavior of creating iterators repeatedly from collection types, and maybe from other source types too.
                 </p>
 
                 <p>
@@ -110,8 +108,8 @@ const Content = () => {
                 <Code code={iterAndIterMut} />
 
                 <p>
-                    This is always the case in the standard library collections.
-                    Even if we start using a new collection from a new crate, we know that these methods will be there if the collection allows.&nbsp;
+                    This is the pattern in the standard library collections.
+                    Even if we start using a new collection from a new crate, we know that these methods will be there if they make sense for the collection.&nbsp;
                     <strong>However, this is nothing but a nice convention.</strong>&nbsp;
                     And this is a bit problematic.
                     Why?
@@ -119,16 +117,19 @@ const Content = () => {
 
                 <div className="seq">
                     <div>
-                        We rely on standard library to continue following this convention whenever a new collection is introduced.
+                        We rely on standard library to continue sticking to this convention whenever a new collection is introduced.
                         Further, we rely on crates of specialized collections to follow this convention.
-                        Actually, they are both great and follow it (◑‿◐).
-                        Yet there exists no trait guaranteeing that these methods will exist with these names and signatures.
+                        There exists no trait guaranteeing that these methods will exist with these names and signatures.
                     </div>
                     <div>
                         More importantly, we lack an important abstraction.
-                        We are not able to implement a function that operates on any iterable or any collection;
+                        We are not able to implement a function that operates on any iterable or on any collection;
                         or we cannot have a type having a field with such a generic type.
                     </div>
+                </div>
+
+                <div className="side-note">
+                    Actually majority of crates developed by community both follow the iter & iter_mut convention which is great (◑‿◐).
                 </div>
 
             </section>
@@ -185,7 +186,8 @@ const Content = () => {
                 <p>
                     Consider a method which creates statistics from a collection of numbers.
                     In order to be able to compute the required values, it needs at least two iterations over the data.
-                    In the following example, we use the Collection trait to define this requirement.
+                    In the following example, we use the Collection trait to define this requirement&nbsp;
+                    <span style={{ color: 'gray', fontStyle: 'italic' }}>(please ignore the obvious div-by-zero error for empty collections ⊙︿⊙)</span>.
                 </p>
 
                 <Code code={exampleCollection} />
@@ -194,7 +196,7 @@ const Content = () => {
 
                 <p>
                     The <code>increment_by_sum</code> method below first computes the sum of all elements and then increments each element by this sum.
-                    Therefore, we require both the iter and iter_mut methods, which can be represented by the CollectionMut trait.
+                    Therefore, we require both <code>iter</code> and <code>iter_mut</code> methods, which can be represented by the CollectionMut trait.
                 </p>
 
                 <Code code={exampleCollectionMut} />
@@ -202,9 +204,8 @@ const Content = () => {
                 <h3>Example: Iterable</h3>
 
                 <p>
-                    In the following example, we relax the <code>Collection</code> requirement on numbers to <code>Iterable</code>.
-                    The example demonstrates the flexibility of the Iterable trait abstracting the input over the three categories of implementing types:
-                    (i) collections, (ii) cloneable iterators and (iii) lazy generators.
+                    In the following example, we relax the <code>Collection</code> requirement on numbers to more general <code>Iterable</code> requirement.
+                    Notice that now we can also additionally cloneable iterators and lazy generators which do not store their elements, such as the range.
                 </p>
 
                 <Code code={exampleIterable} />
@@ -216,6 +217,7 @@ const Content = () => {
 
                 <p>
                     Definitions of the collection traits are straightforward.
+                    They are basic and each have one required method: <code>iter</code> and <code>iter_mut</code>, respectively.
                 </p>
 
                 <Code code={collectionTraits} />
@@ -242,13 +244,18 @@ const Content = () => {
                     </div>
 
                     <div>
-                        Further, we find that <code>&mut Vec&lt;T&gt;</code> implements <code>IntoIterator&lt;Item = &mut T&gt;</code>.
+                        Further, we find out that <code>&mut Vec&lt;T&gt;</code> implements <code>IntoIterator&lt;Item = &mut T&gt;</code>.
                         Similarly, this is equivalent to <code>iter_mut(&mut self)</code> <span className="tick"></span>
                     </div>
                 </div>
 
                 <p>
-                    We have everything we need to implement both collection traits
+                    This design pattern introduced by the standard library is wonderful,
+                    nicely dividing the IntoIterator behavior for collections into three implementations.
+                </p>
+
+                <p>
+                    We have everything we need for implementing both collection traits
                     <br /><Indent />
                     for all collections
                     <br /><Indent />
@@ -270,7 +277,7 @@ const Content = () => {
                     Collection traits are great but they do not represent all iterables.
                     By definition, they are bound to yield shared or mutable references to their elements.
                     Consider iterators that produce their elements on the fly during iteration.
-                    They cannot return a reference to the temporarily computed values.
+                    They cannot return a reference to temporarily computed values.
                     Further notice that mutation is irrelevant for such iterators.
                     Therefore, we require a more general definition for immutable iterables.
                 </p>
@@ -287,7 +294,7 @@ const Content = () => {
 
                 <p>
                     Furthermore, unlike the collection traits, it must be extensible.
-                    In other words, we must be able to implement iterable on any custom type we have, whenever it makes sense.
+                    In other words, we must be able to implement iterable on any custom non-collection type, whenever it makes sense.
                 </p>
 
                 <h3>Collections as Iterables</h3>
@@ -299,9 +306,13 @@ const Content = () => {
                 <Code code={iterableImplForCollections} />
 
                 <p>
-                    This implementation also establishes the useful relationship between the <code>Iterable</code> and <code>Collection</code> traits.
+                    This implementation also establishes the useful relationship between the <code>Iterable</code> and <code>Collection</code> traits:
+                </p>
+
+                <p>
+                    <Indent />
                     If a type <code>X</code> implements <code>Collection</code>, then <code>&X</code> implements <code>Iterable</code>.
-                    Therefore, we can provide its reference to a method accepting an iterable.
+                    Therefore, we can always provide a reference of a Collection to a function expecting an Iterable.
                 </p>
 
                 <h3>Cloneable Iterators</h3>
@@ -318,17 +329,18 @@ const Content = () => {
 
                 <p>
                     Some languages allow resetting and reusing an iterator.
-                    Due to stateful nature of the iterator, this is actually is a very dangerous idea <span className="fail"></span>
+                    However, the iterators are stateful and we are better off if we consume them at once.
+                    Resetting an iterator actually sounds like a very dangerous idea <span className="fail"></span>
                 </p>
 
                 <p>
                     But what if we could move it into a wrapper struct, and return a clone of it every time <code>iter</code> is called.
+                    Then, we can actually turn any cloneable iterator into an iterable.
+                    Simply by calling <code>into_iterable</code>.
                 </p>
 
                 <p>
-                    So we can actually turn any cloneable iterator into an iterable;
-                    simply by calling <code>into_iterable</code>,
-                    as you may see in the convenient implementation below.
+                    As you may see below, we can achieve this for all cloneable iterators at once.
                 </p>
 
                 <Code code={iterableImplForCloneableIterators} />
@@ -354,10 +366,9 @@ const Content = () => {
                 <h2>Conclusion</h2>
 
                 <p>
-                    The goals of implementing <code>Collection</code> and <code>CollectionMut</code> traits have been achieved.
+                    Goals of implementing <code>Collection</code> and <code>CollectionMut</code> traits have been achieved.
                     And all it took was 30 lines to implement them.
                     Rust's type system keeps amazing us ❤️🦀.
-                    And it keeps getting better.
                 </p>
 
                 <p>
@@ -367,14 +378,14 @@ const Content = () => {
 
                 <div className="side-note">
                     Collection traits would not be possible before generic associated types (GAT).
-                    Iterable, on the other hand, would have been possible.
+                    Iterable trait, on the other hand, would have been possible.
                 </div>
 
                 <p>
                     Lastly, it was a very happy moment to see that the traits are automatically implemented by <code>SmallVec</code>,
                     which was the first out-of-std collection I tried.
                     This is probably the nicest result; these traits are and will be implicitly implemented for custom or specialized
-                    collections as long as we do not have missing the <code>IntoIterator</code> implementations.
+                    collections as long as we do not have missing <code>IntoIterator</code> implementations.
                 </p>
 
             </section>
@@ -617,7 +628,7 @@ where
     }
 }`;
 
-const iterableImplForCloneableIterators = `pub struct CloningIterable<I>(I)
+const iterableImplForCloneableIterators = `struct CloningIterable<I>(I)
 where
     I: Iterator + Clone;
 
@@ -634,21 +645,14 @@ where
     }
 }
 
-pub trait IntoCloningIterable: IntoIterator
-where
-    <Self as IntoIterator>::IntoIter: Clone,
-{
-    fn into_iterable(self) -> CloningIterable<<Self as IntoIterator>::IntoIter>;
-}
-
-impl<I> IntoCloningIterable for I
-where
-    I: Iterator + Clone,
-{
-    fn into_iterable(self) -> CloningIterable<<Self as IntoIterator>::IntoIter> {
+trait IntoCloningIterable: Iterator + Clone {
+    fn into_iterable(self) -> CloningIterable<Self> {
         CloningIterable(self)
     }
-}`;
+}
+
+impl<I> IntoCloningIterable for I where I: Iterator + Clone {}
+`;
 
 const iterableTransformations = `use orx_iterable::*;
 use std::collections::HashSet;
@@ -665,6 +669,7 @@ let it = a
     .copied()                   // [3, 8]
     .flat_mapped(|x| [x, -x]);  // [3, -3, 8, -8]
 
+// now we have a transformed Iterable that we can repeatedly iter() over
 assert_eq!(it.iter().count(), 4);
 assert_eq!(it.iter().sum::<i32>(), 0);
 `;
