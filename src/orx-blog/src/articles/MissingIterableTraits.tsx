@@ -183,7 +183,7 @@ const Content = () => {
                     Consider a method which creates statistics from a collection of numbers.
                     In order to be able to compute the required values, it needs at least two iterations over the data.
                     In the following example, we use the Collection trait to define this requirement&nbsp;
-                    <span style={{ color: 'gray', fontStyle: 'italic' }}>(please ignore the obvious div-by-zero error for empty collections ⊙︿⊙)</span>.
+                    <span style={{ color: 'gray', fontStyle: 'italic' }}>(please kindly ignore the div-by-zero error when the collection is empty ⊙︿⊙)</span>.
                 </p>
 
                 <Code code={exampleCollection} />
@@ -409,7 +409,7 @@ const Content = () => {
                         =&gt; actually no care is needed as long as we do not have missing <code>IntoIterator</code> implementations.
                     </li>
                     <li>
-                        <Link text="implementing a custom Iterable" href="https://docs.rs/orx-iterable/latest/orx_iterable/#b3-lazy-generators" />&nbsp;
+                        <Link text="implementing a custom Iterable" href="https://docs.rs/orx-iterable/latest/orx_iterable/#iii-custom-iterables" />&nbsp;
                         =&gt; no different than implementing any trait.
                     </li>
                 </ul>
