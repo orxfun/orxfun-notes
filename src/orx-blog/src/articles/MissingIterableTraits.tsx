@@ -268,6 +268,13 @@ const Content = () => {
                     Maps do not follow the definition above as their iterators behave slightly differently, and hence, they deserve their own trait.
                 </div>
 
+                <p>
+                    That's all.
+                    Collections implicitly implement the collection traits.
+                    You may find <Link text="here" href="https://docs.rs/orx-iterable/latest/orx_iterable/#d-defining-new-custom-collections" />&nbsp;
+                    a guideline and examples for defining custom collections; however, in brief, all we need is not to have missing IntoIterator implementations.
+                </p>
+
             </section>
 
             <section>
