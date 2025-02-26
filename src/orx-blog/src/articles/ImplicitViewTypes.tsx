@@ -28,7 +28,7 @@ const Content = () => {
 
             <p>
                 Subjective and limited to how I use rust, I tried to imagine and understand the impact of view types
-                when I am developing an application or maintaining a general purpose library.
+                while I am developing an application or maintaining a general purpose library.
             </p>
 
             <h2>The Problem</h2>
@@ -42,11 +42,11 @@ const Content = () => {
             </p>
 
             <p>
-                Hoping that we will be able to write this code with the view types suggestion 🤞
+                This code doesn't compile today, but hope it will compile with the recommended view types 🤞
             </p>
 
             <p>
-                It is explained clearly in the blogpost but to briefly mention why this code is okay:
+                It is explained clearly in the blogpost but to briefly mention why this code is actually okay:
             </p>
 
 
@@ -72,28 +72,36 @@ const Content = () => {
             </p>
 
             <p>
-                You may see from the comments that we do not need a shared and mutable reference of any of the fields simultaneously.
-                This code is just fine and <code>count_successful_experiments</code> can now happily compile thanks to view types.
+                You may see from the comments that we do not use a shared and mutable reference (or multiple mutable reference) to any of the fields simultaneously.
+                This code is just fine and <code>count_successful_experiments</code> can now happily compile thanks to view types!
             </p>
 
             <p>
                 This seems to be an explicit and exact solution to the problem we are facing, and it is exciting to see this <i>proposal</i>.
             </p>
 
+            <p>
+                In the following, I tried to imagine how this could affect the development experience apart from the benefit shown here.
+            </p>
+
             <h2>The Problem, Revisited, Simplified</h2>
 
             <p>
-                Let <code>m(i)</code> be the i-th method of a type which requires a shared or mutable reference to <code>self</code>.
+                Below are some simplified definitions to compare the current approach and the potential new approach with view types.
             </p>
 
             <p>
-                Let <code>self_ref(i)</code> be either <code>&self</code> or <code>&mut self</code> depending on the current rust method
-                signature.
+                Let <code>f</code>, <code>g</code>, ... be methods of a type which require a shared or mutable reference to <code>self</code>.
             </p>
 
             <p>
-                Finally, let <code>ref_fields(i)</code> be the set of fields that are used as a shared reference in the i-th method,
-                and <code>mut_fields(i)</code> be the set of fields that are mutated.
+                Let <code>self_ref(f)</code> be either <code>&self</code> or <code>&mut self</code> depending on the current rust method
+                signature of method <code>f</code>.
+            </p>
+
+            <p>
+                Finally, let <code>ref_fields(f)</code> be the set of fields that are used as a shared reference in method <code>f</code>,
+                and <code>mut_fields(f)</code> be the set of those that are mutated.
                 Notice that these sets are as defined with the view types in the original blogpost, and hence, assumed to be available
                 in the new version.
             </p>
@@ -104,16 +112,19 @@ const Content = () => {
 
             <div className="seq">
                 <div>
-                    <code>self_ref(i)</code> is <code>&self</code> iff <code>mut_fields(i) = ∅</code>;
+                    <code>self_ref(f)</code> is <code>&self</code> iff <code>mut_fields(f) = ∅</code>;
                 </div>
 
                 <div>
-                    <code>self_ref(i)</code> is <code>&mut self</code> otherwise.
+                    <code>self_ref(f)</code> is <code>&mut self</code> otherwise.
                 </div>
             </div>
 
             <p>
                 A simplified definition of the problem would be to know the pairwise compatibility of methods.
+            </p>
+
+            <p>
                 More precisely, given two methods <code>f</code> and <code>g</code>, can we know whether or not it is okay
                 to call these methods simultaneously?
                 Let's call this magic function <code>is_compatible(f, g)</code> which answers this question.
@@ -124,13 +135,13 @@ const Content = () => {
             </p>
             <div className="seq">
                 <div>
-                    <code>is_compatible_old(m(i), m(j))</code> is true iff both <code>self_ref(i) = &self</code> and <code>self_ref(j) = &self</code>,
+                    <code>is_compatible_old(f, g))</code> is true iff both <code>self_ref(f) = &self</code> and <code>self_ref(g) = &self</code>,
                 </div>
             </div>
 
             <p>
-                With this definition, <code>is_compatible_old(experiment_names, add_successful)</code> would return false, and hence,
-                the <code>count_successful_experiments</code> method doesn't compile today.
+                With this definition, <code>is_compatible_old(experiment_names, add_successful)</code> would return false,
+                as the <code>count_successful_experiments</code> method doesn't compile today.
             </p>
 
             <p>
@@ -139,10 +150,10 @@ const Content = () => {
 
             <div className="seq">
                 <div>
-                    <code>is_compatible(m(i), m(j))</code> is true iff&nbsp;
+                    <code>is_compatible(f, g)</code> is true iff&nbsp;
                     <ul>
-                        <li><code>mut_fields(i) ∩ (ref_fields(j) ∪ mut_fields(j)) = ∅</code> and</li>
-                        <li><code>(ref_fields(i) ∪ mut_fields(i)) ∩ mut_fields(j) = ∅</code>.</li>
+                        <li><code>mut_fields(f) ∩ (ref_fields(g) ∪ mut_fields(g)) = ∅</code> and</li>
+                        <li><code>(ref_fields(f) ∪ mut_fields(f)) ∩ mut_fields(g) = ∅</code>.</li>
                     </ul>
                 </div>
             </div>
@@ -165,14 +176,14 @@ const Content = () => {
 
             <p>
                 The problem definition and recommended solution both seem great.
-                However, there might be concerns on the ergonomics and possibility of adding complexity.
+                However, there might be concerns on adding complexity.
             </p>
 
             <h3>Developing an Application</h3>
 
             <p>
-                <span className="inline-emphasis">Firstly</span>, assume that we are developing an application to address a particular problem where we are
-                working on a relatively high level.
+                <span className="inline-emphasis">Firstly</span>, assume that we are developing an application to address a particular business problem
+                where we are working on a relatively high level.
             </p>
 
             <p>
@@ -196,58 +207,71 @@ const Content = () => {
             </div>
 
             <p>
-                In other words, there are use cases that the problem is not, or less, critical.
+                In summary,
+            </p>
+
+            <div className="emphasis">
+                There are use cases where this problem is not, or is less, significant.
+            </div>
+
+            <p>
                 Therefore, it would be great if we can continue to develop these applications as convenient as we do today.
             </p>
 
             <h3>Maintaining a General Purpose Library</h3>
 
             <p>
-                <span className="inline-emphasis">Secondly</span>, assume that we are maintaining some utility library or some data structure.
+                <span className="inline-emphasis">Secondly</span>, assume that we are maintaining a utility library or some data structure.
                 We will likely use <code>mut</code> within the library code.
-                Further, we will most likely expose <code>&mut self</code> methods in the api.
-                The discussed problem and the solution with the view types might be much more crucial here.
+                Further, we will most likely expose useful <code>&mut self</code> methods in the api.
+                The discussed problem and the solution with the view types might be very crucial here.
             </p>
 
             <p>
                 Such cases often differ from the application code in that we do not have access to all use cases.
-                We make methods available in the public api; however, we do not exactly know which pairs will be used together
-                (although we might have some idea).
+                We make methods available in the public api; however, we do not exactly know how these methods are used in different
+                use cases (although we might have some idea).
                 More specifically, we do not know for which pairs the compiler will call <code>is_compatible</code> in applications
                 that use our library.
             </p>
 
             <p>
-                Let's focus on how we develop the exposed <code>&mut self</code> methods differently than how we do today.
+                Let's focus on how we would develop the exposed <code>&mut self</code> methods differently than how we do today.
             </p>
 
             <p>
-                As maintainers, we would do our best to make use of view types and prevent more of the false-error cases.
+                We would of course do our best to make use of view types and prevent more of the false-error cases.
             </p>
 
             <p>
-                On the extreme, this would push us to define view types for every accessed field in every method.
+                Not knowing all the use patterns,
+                this would push us to define view types for every accessed field in every exposed method
             </p>
 
             <p>
-                Then, we could lose benefits we get from bundling up types in an aggregate type.
+                Then, we could lose benefits we get from bundling up smaller types to make a larger aggregate type.
                 From the point of view of a consumer of the type:
             </p>
 
             <div className="emphasis">
-                It is often simpler, nicer and less exhausting to think of an instance of the aggregate type as <strong>one whole thing</strong>.
+                It is often nicer and simpler to think of an instance of a type as <strong>one whole thing</strong>,
+                than considering its pieces.
             </div>
 
             <p>
-                Further, the new signatures might add complexity to the nice syntax we have today.
-                Although, I would like the explicitness of view types to <span className="inline-emphasis">somehow*</span> exist:
+                Further, our signatures might get complicated as I believe:
             </p>
 
             <div className="emphasis">
                 <code>fn add_successful(self: &mut &#123;successful&#125; Self)</code><br />
-                is a more complex signature than<br />
-                <code>fn add_successful(&mut self)</code> which is often good enough.
+                is a significantly more complex signature than<br />
+                <code>fn add_successful(&mut self)</code><br />
+                which is often good enough.
             </div>
+
+            <p>
+                So could the view types <span className="inline-emphasis">somehow*</span> exist but not in the method signature?
+            </p>
 
             <h2>Could View Types Exist Implicitly?</h2>
 
@@ -256,7 +280,7 @@ const Content = () => {
             </p>
 
             <p>
-                Could the compiler implicitly figure out the view types from the implementation of the method so that
+                Could the compiler implicitly figure out the view types from the implementation of the method so that:
             </p>
 
             <div className="seq">
@@ -277,14 +301,10 @@ const Content = () => {
 
             <div className="seq">
                 <div>
-                    Our closures are strongly typed.
+                    Our closures are strongly typed; however, we rarely need to type or see these types.
                 </div>
                 <div>
-                    However, we rarely need to type or see these types.
-                </div>
-                <div>
-                    We need to see the type signature and the compiler feedback only when we make a mistake
-                    and compiler pinpoints to the problem.
+                    We need to see the type signature only when we make a mistake and compiler pinpoints to the problem.
                 </div>
             </div>
 
@@ -292,22 +312,17 @@ const Content = () => {
 
             <p>
                 I am excited to see that this problem is in the focus with a great recommendation.
-                Some developers consider rust to be a complex language with a steep learning curve.
+                Some developers consider rust to be a complex language.
                 Correct code that is rejected by the compiler is likely contributing to this perception.
             </p>
 
             <p>
-                On the bright side, the situation keeps on getting better.
-                And view types seem to promise further significant improvements.
-            </p>
-
-            <p>
-                I would only hope that we don't compromise the ergonomics of rust that
-                we love ❤️<img src="https://rustacean.net/assets/rustacean-orig-noshadow.png" height="15px" />.
+                However, this situation keeps on getting better ❤️<img src="https://rustacean.net/assets/rustacean-orig-noshadow.png" height="15px" />.
+                And view types seem to be an exciting suggestion promising further significant improvements.
             </p>
 
             <div className="side-note">
-                ps: we enjoy every keyword that doesn't enter rust.
+                ps: we enjoy every keyword that doesn't enter rust :)
             </div>
 
             <div className="end-space"></div>
