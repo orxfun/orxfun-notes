@@ -321,10 +321,6 @@ const Content = () => {
                 And view types seem to be an exciting suggestion promising further significant improvements.
             </p>
 
-            <div className="side-note">
-                ps: we enjoy every keyword that doesn't enter rust :)
-            </div>
-
             <div className="end-space"></div>
         </>
     );
