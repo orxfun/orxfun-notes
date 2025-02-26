@@ -21,9 +21,9 @@ const Content = () => {
             <span className="date">{summary}</span>
 
             <p>
-                This article reviews and discusses the view types suggestion presented in the
-                &nbsp;<Link text="view types-redux" href="https://smallcultfollowing.com/babysteps/blog/2025/02/25/view types-redux/" />&nbsp;
-                blogpost by Nicholas Matsakis, from a user perspective.
+                This article discusses from a user perspective, the view types suggestion presented in the
+                &nbsp;<Link text="view types-redux" href="https://smallcultfollowing.com/babysteps/blog/2025/02/25/view-types-redux/" />&nbsp;
+                blogpost by Nicholas Matsakis.
             </p>
 
             <p>
@@ -42,7 +42,7 @@ const Content = () => {
             </p>
 
             <p>
-                This code doesn't compile today, but hope it will compile with the recommended view types 🤞
+                This code doesn't compile today, but it will hopefully compile with the recommended view types 🤞
             </p>
 
             <p>
@@ -68,11 +68,14 @@ const Content = () => {
 
             <p>
                 Notice the changes in the <code>self</code> arguments of the methods.
-                We explicitly mention the fields that are used, and how they are used, mutably or not.
             </p>
 
+            <div className="emphasis">
+                We explicitly mention the fields that are used, and how they are used, mutably or not.
+            </div>
+
             <p>
-                You may see from the comments that we do not use a shared and mutable reference (or multiple mutable reference) to any of the fields simultaneously.
+                You may see from the comments that we do not use a shared and mutable reference (or multiple mutable references) to any of the fields simultaneously.
                 This code is just fine and <code>count_successful_experiments</code> can now happily compile thanks to view types!
             </p>
 
@@ -80,18 +83,14 @@ const Content = () => {
                 This seems to be an explicit and exact solution to the problem we are facing, and it is exciting to see this <i>proposal</i>.
             </p>
 
-            <p>
-                In the following, I tried to imagine how this could affect the development experience apart from the benefit shown here.
-            </p>
-
             <h2>The Problem, Revisited, Simplified</h2>
 
             <p>
-                Below are some simplified definitions to compare the current approach and the potential new approach with view types.
+                Below are some simplified definitions to help compare the current approach and the potential new approach with view types.
             </p>
 
             <p>
-                Let <code>f</code>, <code>g</code>, ... be methods of a type which require a shared or mutable reference to <code>self</code>.
+                Let <code>f</code>, <code>g</code>, ... be all methods of one particular type which require a shared or mutable reference to <code>self</code>.
             </p>
 
             <p>
@@ -102,7 +101,7 @@ const Content = () => {
             <p>
                 Finally, let <code>ref_fields(f)</code> be the set of fields that are used as a shared reference in method <code>f</code>,
                 and <code>mut_fields(f)</code> be the set of those that are mutated.
-                Notice that these sets are as defined with the view types in the original blogpost, and hence, assumed to be available
+                Notice that these sets are as defined with the view types in the blogpost, and hence, assumed to be available
                 in the new version.
             </p>
 
@@ -135,17 +134,17 @@ const Content = () => {
             </p>
             <div className="seq">
                 <div>
-                    <code>is_compatible_old(f, g))</code> is true iff both <code>self_ref(f) = &self</code> and <code>self_ref(g) = &self</code>,
+                    <code>is_compatible_old(f, g)</code> is true iff both <code>self_ref(f) = &self</code> and <code>self_ref(g) = &self</code>,
                 </div>
             </div>
 
             <p>
-                With this definition, <code>is_compatible_old(experiment_names, add_successful)</code> would return false,
-                as the <code>count_successful_experiments</code> method doesn't compile today.
+                With this definition, <code>is_compatible_old(experiment_names, add_successful)</code> would return false.
+                As we see that the <code>count_successful_experiments</code> method doesn't compile today.
             </p>
 
             <p>
-                As described in the blogpost, we can have a straightforward re-definition of this function using view types.
+                Using the recommended view types, we can have a straightforward re-definition of this function.
             </p>
 
             <div className="seq">
@@ -172,11 +171,16 @@ const Content = () => {
                 As described in the example, the new condition would allow the <code>count_successful_experiments</code> method to compile.
             </p>
 
+            <p>
+                In the following, I tried to imagine how this could affect the development experience apart from the benefit shown here.
+            </p>
+
             <h2>Concerns on Complexity</h2>
 
             <p>
                 The problem definition and recommended solution both seem great.
                 However, there might be concerns on adding complexity.
+                Limited to my experience and use cases, I tried to imagine the impact in two different scenarios.
             </p>
 
             <h3>Developing an Application</h3>
@@ -191,7 +195,7 @@ const Content = () => {
             </p>
 
             <p>
-                Particularly, we avoid <code>mut</code> keyword as much as possible.
+                We avoid <code>mut</code> keyword as much as possible.
                 This brings so many benefits.
                 The code becomes less error prone, more concise, more expressive that is easier to follow and reason about.
                 As a side bonus, we may <code>pub</code>-reveal fields that we want without the anxiety of harmful mutations.
@@ -224,12 +228,12 @@ const Content = () => {
                 <span className="inline-emphasis">Secondly</span>, assume that we are maintaining a utility library or some data structure.
                 We will likely use <code>mut</code> within the library code.
                 Further, we will most likely expose useful <code>&mut self</code> methods in the api.
-                The discussed problem and the solution with the view types might be very crucial here.
+                The discussed problem and the solution with the view types might become very crucial here.
             </p>
 
             <p>
                 Such cases often differ from the application code in that we do not have access to all use cases.
-                We make methods available in the public api; however, we do not exactly know how these methods are used in different
+                We make methods available in the public api; however, we do not exactly know how these methods are used together in different
                 use cases (although we might have some idea).
                 More specifically, we do not know for which pairs the compiler will call <code>is_compatible</code> in applications
                 that use our library.
@@ -245,7 +249,7 @@ const Content = () => {
 
             <p>
                 Not knowing all the use patterns,
-                this would push us to define view types for every accessed field in every exposed method
+                this might push us to define view types for every accessed field in every exposed method.
             </p>
 
             <p>
@@ -254,8 +258,8 @@ const Content = () => {
             </p>
 
             <div className="emphasis">
-                It is often nicer and simpler to think of an instance of a type as <strong>one whole thing</strong>,
-                than considering its pieces.
+                It is often nicer and simpler to think of an instance of the type as <strong>one whole thing</strong>,
+                rather than considering its pieces.
             </div>
 
             <p>
@@ -264,7 +268,7 @@ const Content = () => {
 
             <div className="emphasis">
                 <code>fn add_successful(self: &mut &#123;successful&#125; Self)</code><br />
-                is a significantly more complex signature than<br />
+                is significantly more complex than<br />
                 <code>fn add_successful(&mut self)</code><br />
                 which is often good enough.
             </div>
@@ -295,30 +299,39 @@ const Content = () => {
             </div>
 
             <p>
-                As also mentioned in the type inference section of the blogpost,&nbsp;
-                <span className="inline-emphasis">somehow*</span> as in closures.
+                Relevant to the type inference section of the blogpost,
+                could the experience be <span className="inline-emphasis">somehow*</span> similar to closures?
             </p>
 
             <div className="seq">
                 <div>
-                    Our closures are strongly typed; however, we rarely need to type or see these types.
+                    Our closures are strongly typed; however, we rarely type these types or look at the signatures.
                 </div>
                 <div>
                     We need to see the type signature only when we make a mistake and compiler pinpoints to the problem.
                 </div>
+                <div>
+                    Similarly, could we not type and see the view types by default;
+                    yet, they exist and they are available whenever we need them?
+                </div>
             </div>
+
+            <p>
+                Might be asking too much :-)
+            </p>
 
             <h2>Conclusion</h2>
 
             <p>
                 I am excited to see that this problem is in the focus with a great recommendation.
                 Some developers consider rust to be a complex language.
-                Correct code that is rejected by the compiler is likely contributing to this perception.
+                Correct code that is rejected by the compiler is likely to be contributing to this perception.
             </p>
 
             <p>
-                However, this situation keeps on getting better ❤️<img src="https://rustacean.net/assets/rustacean-orig-noshadow.png" height="15px" />.
-                And view types seem to be an exciting suggestion promising further significant improvements.
+                However, this situation keeps on getting better.
+                And view types seem to be an exciting suggestion, promising further significant improvements.
+                Looking forward to it ❤️<img src="https://rustacean.net/assets/rustacean-orig-noshadow.png" height="15px" />
             </p>
 
             <div className="end-space"></div>
