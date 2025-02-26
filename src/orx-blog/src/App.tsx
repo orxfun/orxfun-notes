@@ -7,6 +7,7 @@ import { Page } from "./Page";
 import { PageMetaImpVecMotivation } from "./articles/ImpVecMotivation";
 import { PageMetaVForVectors } from "./articles/VForVectors";
 import { PageMetaMissingIterableTraits } from "./articles/MissingIterableTraits";
+import { PageMetaImplicitViewTypes } from './articles/ImplicitViewTypes';
 
 export type PageMeta = {
   path: string,
@@ -19,6 +20,7 @@ export type PageMeta = {
 function App() {
 
   const articles: PageMeta[] = [
+    PageMetaImplicitViewTypes(),
     PageMetaMissingIterableTraits(),
     PageMetaVForVectors(),
     PageMetaImpVecMotivation(),
