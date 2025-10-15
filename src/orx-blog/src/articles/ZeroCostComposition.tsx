@@ -873,8 +873,8 @@ impl From<queue_of!(u32, bool, char, String)> for ComplexStruct {
 }
 
 let val: ComplexStruct = QueueBuilder::<queue_of!(u32, bool, char, String)>::new()
-    .push(42) // cannot call in wrong order
-    .push(true)
+    .push(42) // cannot call with wrong type, or
+    .push(true) // cannot call in wrong order
     .push('x')
     .push("foo".to_string())
     .finish() // cannot finish before pushing all fields
