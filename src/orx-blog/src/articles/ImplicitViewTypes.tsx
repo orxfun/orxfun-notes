@@ -4,7 +4,7 @@ import { Link } from "./Link";
 
 const path = '/implicit-view types-2025-02-26';
 const title = 'Implicit View Types';
-const date = '2024-02-26';
+const date = '2025-02-26';
 const summary = 'complexity perspective on view types'
 
 export const PageMetaImplicitViewTypes = () => {

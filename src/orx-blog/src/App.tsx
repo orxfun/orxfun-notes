@@ -8,6 +8,7 @@ import { PageMetaImpVecMotivation } from "./articles/ImpVecMotivation";
 import { PageMetaVForVectors } from "./articles/VForVectors";
 import { PageMetaMissingIterableTraits } from "./articles/MissingIterableTraits";
 import { PageMetaImplicitViewTypes } from './articles/ImplicitViewTypes';
+import { PageMetaZeroCostComposition } from './articles/ZeroCostComposition';
 
 export type PageMeta = {
   path: string,
@@ -24,6 +25,7 @@ function App() {
     PageMetaMissingIterableTraits(),
     PageMetaVForVectors(),
     PageMetaImpVecMotivation(),
+    PageMetaZeroCostComposition(),
   ];
 
   const top = <Top />;

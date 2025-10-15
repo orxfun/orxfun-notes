@@ -1,5 +1,8 @@
 {
     "html.format.wrapLineLength": 80,
     "editor.formatOnSave": true,
-    "notebook.formatOnSave.enabled": true
+    "notebook.formatOnSave.enabled": true,
+    "cSpell.words": [
+        "sbox"
+    ]
 }
