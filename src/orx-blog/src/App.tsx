@@ -21,11 +21,11 @@ export type PageMeta = {
 function App() {
 
   const articles: PageMeta[] = [
+    PageMetaZeroCostComposition(),
     PageMetaImplicitViewTypes(),
     PageMetaMissingIterableTraits(),
     PageMetaVForVectors(),
     PageMetaImpVecMotivation(),
-    PageMetaZeroCostComposition(),
   ];
 
   const top = <Top />;

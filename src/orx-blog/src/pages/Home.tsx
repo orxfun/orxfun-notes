@@ -12,25 +12,24 @@ export const Home = ({ articles }: HomeProps) => {
     return (
         <div className='article home'>
 
-            <h1 style={{ fontStyle: 'italic', fontWeight: 'normal' }}>
+            <h1 style={{ fontStyle: 'italic', fontWeight: 'normal', width: '100%' }}>
                 notes about <Link text="orxfun" href="https://github.com/orxfun/" /> development
             </h1>
 
-            <div className="articles-list">
+            <div className="article-list">
                 {
                     articles.map(x => {
                         return (
-                            <div className="link-block" key={x.path}>
-                                <div className='link'>
+                            <div className="article-list-item">
+                                <div>{x.date}</div>
+                                <div className="article-list-definition">
                                     <RouteLink to={x.path} title={x.summary}>{x.title}</RouteLink>
-                                    <span className='date'>{x.date}</span>
+                                    <p className="article-summary">{x.summary}</p>
                                 </div>
                             </div>
-                        )
+                        );
                     })
                 }
-
-                <div className="end-space"></div>
             </div>
 
         </div>

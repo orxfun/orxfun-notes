@@ -1,6 +1,6 @@
 :root {
     --color-code: #79a6d2;
-    --color-emphasis: #e6e600;
+    --color-emphasis: #ccff66;
 }
 
 
@@ -68,8 +68,8 @@
 }
 
 .article .emphasis {
-    text-align: center;
-    padding: 0.5rem 0.5rem;
+    text-align: left;
+    padding: 0.5rem 1.5rem;
     border-left: 0.4rem solid var(--color-emphasis);
     border-right: 0.1rem solid var(--color-emphasis);
     color: var(--color-emphasis);
@@ -158,4 +158,19 @@
     color: #88cc00;
     font-weight: bold;
     text-shadow: 0 1px 0 rgb(25, 25, 25);
+}
+
+.article table {
+    border-collapse: collapse;
+}
+
+.article table tr {
+    border-bottom: 1px solid white;
+    height: 2rem;
+}
+
+.article table td,
+.article table th {
+    text-align: left;
+    padding: 0.5rem 1.5rem;
 }

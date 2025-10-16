@@ -5,7 +5,7 @@ import { Link } from "./Link";
 const path = '/zero-cost-composition-2025-10-15';
 const title = 'Zero Cost Composition';
 const date = '2025-10-15';
-const summary = 'zero cost composition approach for classical polymorphism problem'
+const summary = 'zero cost composition and the power of GATs'
 
 export const PageMetaZeroCostComposition = () => {
     const content = <Content />;
@@ -21,7 +21,7 @@ const Content = () => {
             <span className="date">{summary}</span>
 
             <p>
-                The goal is to enable zero-cost composition of heterogeneous types sharing a common behavior.
+                The goal of the approach discussed in this article is to enable zero-cost composition of heterogeneous types sharing a common behavior.
             </p>
 
             <p>
@@ -29,16 +29,31 @@ const Content = () => {
             </p>
 
             <p>
-                Let's consider the classical polymorphism problem where we want to implement a screen that can draw
-                all elements of a heterogeneous collection of components that can be drawn.
+                Let's consider the classical polymorphism problem where
+            </p>
+
+            <div className="emphasis">
+                we want to implement a screen that can draw all elements of a heterogeneous collection of components that can be drawn.
+            </div>
+
+            <p>
+                Two well-known solutions are the trait object & enum solutions, which are quite different.
             </p>
 
             <p>
-                Here, in addition to trait object & enum solutions, we propose a very different approach.
+                This article proposes a third approach, which is even more different :)
             </p>
 
             <p>
-                This new approach is published in the <code>queue</code> module of the <Link text="orx-meta" href="https://crates.io/crates/orx-meta" /> crate.
+                Finally, generic associated types (GATs) are relatively recent additions to rust.
+                Most of the time, usage of GATs are considered together with lifetimes as it solves important lifetime-related issues.
+                However, its usage is not limited to lifetimes.&nbsp;
+                <span className="inline-emphasis">GATs are like functions of the type system</span>.
+                The approaches described in this article demonstrates an example of the power of GATs.
+            </p>
+
+            <p>
+                Discussed approach is published in the <code>queue</code> module of the <Link text="orx-meta" href="https://crates.io/crates/orx-meta" /> crate.
             </p>
 
             <h2>Another Way to Draw Components on the Screen</h2>
@@ -48,20 +63,18 @@ const Content = () => {
                 <Link text="trait objects chapter" href="https://doc.rust-lang.org/book/ch18-02-trait-objects.html" />, is as follows:
             </p>
 
-            <ul>
-                <li>We have a <code>Draw</code> trait and various components such as button and select box implement this trait.</li>
-                <li>We have a <code>Screen</code> which is a collection of components that we can draw.</li>
-                <li>Three methods are required for the screen.</li>
-                <li>
-                    Since screen is a collection of components, we need <code>new</code> to
+            <div className="seq">
+                <div>We have a <code>Draw</code> trait and various components, such as button and select box, implement this trait.</div>
+                <div>The <code>Screen</code> is a collection of components that we can draw.</div>
+                <div>Three methods are required for the screen.</div>
+                <div>
+                    Since screen is sort of a collection, we need <code>new</code> to
                     create an empty screen and <code>push</code> to add a component to it.
-                </li>
-                <li>The third method <code>draw</code> is related to the common behavior and draws all components on the screen.</li>
-            </ul>
+                </div>
+                <div>The third method <code>draw</code> is related to the common behavior and draws all components on the screen.</div>
+            </div>
 
-            <p>
-                The following demonstrates the setup and a couple of example component implementations.
-            </p>
+            <p>We first set up the draw trait and a couple of implementations for the example.</p>
 
             <Code code={drawTrait} />
 
@@ -75,22 +88,28 @@ const Content = () => {
             <Code code={solutionTraitObjects} />
 
             <div style={{ display: "grid", gridTemplateColumns: '1fr 1fr', }}>
-                <div style={{ textAlign: 'center' }}>
-                    <p style={{ color: 'lime', fontWeight: 'bold' }}>PROS</p>
-                    <p>It is open for extension. Another codebase can implement a new component and add it to the screen.</p>
-                    <p>
-                        No boilerplate code is required.
-                        We only iterate over elements of the vec and call draw on each item.
-                    </p>
-                    <p>
-                        <code>Screen</code> is nothing but a wrapper for <code>Vec</code>.
-                        No additional types are required.
-                    </p>
+                <div>
+                    <p style={{ color: 'lime', fontWeight: 'bold', textAlign: 'center' }}>PROS</p>
+                    <div className="seq">
+                        <div>
+                            It is open for extension. Another codebase can define a new component, implement <code>Draw</code> for it and add it to the screen.
+                        </div>
+                        <div>
+                            No boilerplate code is required.
+                            We only iterate over elements of the vec and call draw on each item.
+                        </div>
+                        <div>
+                            <code>Screen</code> is nothing but a wrapper for <code>Vec</code>.
+                            No additional types are required.
+                        </div>
+                    </div>
                 </div>
-                <div style={{ textAlign: 'center' }}>
-                    <p style={{ color: 'red', fontWeight: 'bold' }}>CONS</p>
-                    <p>Requires heap allocation for components in <code>Box</code>.</p>
-                    <p><code>draw</code> calls of components are virtual; hence, requires dynamic dispatch.</p>
+                <div>
+                    <p style={{ color: 'red', fontWeight: 'bold', textAlign: 'center' }}>CONS</p>
+                    <div className="seq">
+                        <div>Requires heap allocation for components in <code>Box</code>.</div>
+                        <div><code>draw</code> calls of components are virtual; hence, requires dynamic dispatch.</div>
+                    </div>
                 </div>
             </div>
 
@@ -103,42 +122,48 @@ const Content = () => {
 
             <p>
                 Another elegant way to represent polymorphic behavior in rust is to use sum types or enums.
-                Enum solution for this example could look like as the following.
+                Enum solution for this example could look like the following.
             </p>
 
             <Code code={solutionEnums} />
 
             <div style={{ display: "grid", gridTemplateColumns: '1fr 1fr', }}>
-                <div style={{ textAlign: 'center' }}>
-                    <p style={{ color: 'lime', fontWeight: 'bold' }}>PROS</p>
-                    <p>
-                        No heap allocation required.
-                        We might waste some memory when sizes of component variants vary significantly.
-                        Nevertheless, this is preferable over boxing in most cases.
-                    </p>
-                    <p>
-                        No virtual method calls.
-                        All of the <code>component.draw()</code> calls are direct method calls.
-                        There still exists runtime branching cost due to potentially large <code>match</code> clause.
-                        This is still preferable over dynamic dispatch in most cases.
-                    </p>
-                    <p>
-                        <code>Screen</code> is nothing but a wrapper for <code>Vec</code>.
-                        No additional types are required.
-                    </p>
+                <div>
+                    <p style={{ color: 'lime', fontWeight: 'bold', textAlign: 'center' }}>PROS</p>
+                    <div className="seq">
+                        <div>
+                            No heap allocation required.
+                            We might waste some memory when sizes of component variants vary significantly.
+                            Nevertheless, this is preferable over boxing in most cases.
+                        </div>
+                        <div>
+                            No virtual method calls.
+                            All of the <code>component.draw()</code> calls are direct method calls.
+                            There still exists runtime branching cost due to potentially large <code>match</code> clause.
+                            This is still preferable over dynamic dispatch in most cases.
+                        </div>
+                        <div>
+                            <code>Screen</code> is nothing but a wrapper for <code>Vec</code>.
+                            No additional types are required.
+                        </div>
+                    </div>
                 </div>
-                <div style={{ textAlign: 'center' }}>
-                    <p style={{ color: 'red', fontWeight: 'bold' }}>CONS</p>
-                    <p>
-                        It is closed for extension.
-                        If we or someone else creates a new component that can be drawn, it must be added as a variant to the <code>Component</code> enum.
-                        This is a breaking change ‼️
-                        Therefore, it fits to situations where only we extend and we don't extend often.
-                    </p>
-                    <p>
-                        Some boilerplate involved in <code>Component::draw</code> implementation that gets longer and longer as we have more variants.
-                        However, crates such as <Link text="enum_dispatch" href="https://crates.io/crates/enum_dispatch" /> let us overcome this issue ❤️
-                    </p>
+                <div>
+                    <p style={{ color: 'red', fontWeight: 'bold', textAlign: 'center' }}>CONS</p>
+                    <div className="seq">
+                        <div>
+                            It is closed for extension.
+                            Defining a new component and implementing <code>Draw</code> for it is not sufficient.
+                            The variant must also be added to the <code>Component</code> enum.
+                            This is a breaking change ‼️
+                            Therefore, this approach is most practical when only we extend and we don't extend often.
+                        </div>
+                        <div>
+                            Some boilerplate involved in <code>Component::draw</code> implementation.
+                            The <code>match</code> statement gets longer and longer as we define more variants.
+                            However, crates such as <Link text="enum_dispatch" href="https://crates.io/crates/enum_dispatch" /> let us overcome this issue 🚀
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -146,16 +171,18 @@ const Content = () => {
                 Notice that this implementation has significantly different properties.
             </p>
 
-            <p>
-                How about a completely different third approach (｡♥‿♥｡)
-            </p>
-
             <h2>Approach #3: Zero Cost Compositions</h2>
 
             <p>
-                Due to use of the <code>orx_meta::define_queue</code> macro, the following will look a bit magical.
-                We will desugar it to make it completely clear, which will demonstrate the power of <strong>generic associated types (GAT)</strong>.
-                We will also discuss what we cannot represent within the type system and why we need the macro.
+                How about a completely different third approach?
+            </p>
+
+            <p>
+                We will first see the solution in the following code block.
+                Due to use of the <Link text="define_queue" href="https://docs.rs/orx-meta/latest/orx_meta/macro.define_queue.html" /> macro,
+                it will not be clear at first.
+                Then, we will dive into details which will demonstrate the power of <strong>generic associated types (GAT)</strong>.
+                We will also discuss what we cannot represent the composition within the type system and why we need the macro.
             </p>
 
             <p>
@@ -169,58 +196,57 @@ const Content = () => {
             </ul>
 
             <p>
-                Most importantly <span className="inline-emphasis">we require both empty and non-empty screen to implement Draw</span>.
+                Lastly, in addition to elements of the queue, or the components on the screen,&nbsp;
+                <span className="inline-emphasis">we require both empty and non-empty screen to implement Draw</span>.
                 This is the key idea behind zero-cost compositions.
             </p>
 
-            <ul>
-                <li>
-                    (identity)
-                    While implementing the common behavior (<code>Draw</code>) for empty queue (<code>EmptyScreen</code>),
-                    we express the expected common behavior in the absence of any element.
-                </li>
-                <li>
-                    (composition)
-                    While implementing the common behavior for the non-empty queue (<code>Screen</code>),
-                    we express how we should compose the common behavior of multiple elements.
-                </li>
-            </ul>
-
             <Code code={solutionComposition} />
 
+            <p>
+                Looks ergonomic, similar to the previous solutions.
+            </p>
+
             <div style={{ display: "grid", gridTemplateColumns: '1fr 1fr', }}>
-                <div style={{ textAlign: 'center' }}>
-                    <p style={{ color: 'lime', fontWeight: 'bold' }}>PROS</p>
-                    <p>It is open for extension. Another codebase can implement a new component and add it to the screen.</p>
-                    <p>
-                        No heap allocation required.
-                        Memory layout of the <code>screen</code> above is identical to the <code>struct MyScreen(Button, Button, SelectBox, Button)</code>.
-                        Further, there is not even an allocation for the <code>Vec</code>.
-                    </p>
-                    <p>
-                        No virtual method calls, all <code>draw</code> calls are statically dispatched.
-                        Further, there is no run-time branching.
-                        Final <code>screen.draw()</code> call can completely be inlined by the compiler
-                        as <code>btn1.draw(); btn2.draw(); sbox.draw(); btn3.draw();</code>.
-                    </p>
+                <div>
+                    <p style={{ color: 'lime', fontWeight: 'bold', textAlign: 'center', }}>PROS</p>
+                    <div className="seq">
+                        <div>
+                            It is open for extension. Another codebase can define a new component, implement <code>Draw</code> for it and add it to the screen.
+                        </div>
+                        <div>
+                            No heap allocation required for the components.
+                            Further, there is not even an allocation for a <code>Vec</code>.
+                        </div>
+                        <div>
+                            No virtual method calls, all <code>draw</code> calls are statically dispatched.
+                            Further, there is no run-time branching.&nbsp;
+                            <code>screen.draw()</code> call can completely be inlined by the compiler
+                            as <code>btn1.draw(); btn2.draw(); sbox.draw(); btn3.draw();</code>.
+                        </div>
+                    </div>
                 </div>
-                <div style={{ textAlign: 'center' }}>
-                    <p style={{ color: 'red', fontWeight: 'bold' }}>CONS</p>
-                    <p>
-                        <code>Screen</code> is a new type specific to the <code>Draw</code> trait, has two generic parameters and it is more complex than
-                        the <code>Vec</code> wrappers used in the previous approaches.
-                    </p>
+                <div>
+                    <p style={{ color: 'red', fontWeight: 'bold', textAlign: 'center', }}>CONS</p>
+                    <div className="seq">
+                        <div>
+                            <code>Screen</code> is a new type specific to the <code>Draw</code> trait, it has two generic parameters and it is more complex than
+                            the <code>Vec</code> wrappers used in the previous approaches.
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <p>
-                The con is clear and one of the objectives of the <strong>orx-meta</strong> crate is to overcome this as conveniently as possible.
+                The con is clear and one of the objectives of the <Link text="orx-meta" href="https://crates.io/crates/orx-meta" /> crate
+                is to overcome this as conveniently as possible.
             </p>
             <p>
                 The pros, on the other hand, might sound confusing.
-                Consider the following implementation which is hand-written specifically for a screen of three buttons
-                and a select-box.
-                Knowing that this is identical to the screen implementation above helps to understand how the pros are achieved.
+                In order to clarify consider the following implementation which is hand-written specifically for a screen with three buttons
+                and one select-box.
+                It is easy to notice that this solution has the above-mentioned advantages.
+                Under the hood, this is identical to the screen implementation as a statically typed queue.
             </p>
 
             <Code code={solutionCompositionHandWritten} />
@@ -241,16 +267,25 @@ const Content = () => {
 
             <p>But how does this work?</p>
 
-            <p>Thanks to the great rust-type system and power of GATs 💪</p>
+            <p>Thanks to the rust-type system and power of GATs 💪</p>
 
-            <p>Expansion of the <Link text="define_queue" href="https://docs.rs/orx-meta/latest/orx_meta/macro.define_queue.html" /> macro reveals this.</p>
+            <p>
+                To understand better,
+                let's check the expansion of the <Link text="define_queue" href="https://docs.rs/orx-meta/latest/orx_meta/macro.define_queue.html" /> macro.
+            </p>
 
             <Code code={solutionCompositionExpansion} />
+
+            <div className="emphasis">
+                Note the resemblance of <code>push</code> method and <code>PushBack</code> type,&nbsp;
+                <span className="inline-emphasis">GATs are like functions of the type system</span>.
+            </div>
+
 
             <h3>Statically-typed Screen Trait</h3>
 
             <p>
-                The <code>StScreen</code> trait defines a queue with statically-typed elements and constant <code>LEN</code>.
+                The <code>StScreen</code> trait defines a queue with statically-typed elements and a constant <code>LEN</code>.
             </p>
 
             <p>Although this is not critical here, it is useful to clarify that this a queue due to the following:</p>
@@ -261,18 +296,18 @@ const Content = () => {
             </ul>
 
             <p>
-                Notice GAT <code>type PushBack&lt;T&gt;: StScreen where T: Draw;</code> which handles a couple of important things:
+                Notice the GAT: <code>type PushBack&lt;T&gt;: StScreen where T: Draw;</code> which handles a couple of critical tasks:
             </p>
             <ul>
                 <li>It restricts that we can only push types that implement <code>Draw</code>.</li>
                 <li>
-                    It tells the queue obtained by pushing a component to it also implements <code>StScreen</code>.
-                    This means that we can keep calling <code>push</code> since we always get a <code>StScreen</code>.
+                    It makes sure that the queue obtained by pushing a component to it also implements <code>StScreen</code>.
+                    This means that we can keep calling <code>push</code> since we always get another <code>StScreen</code>.
                 </li>
             </ul>
 
             <p>
-                Then, we have two concrete implementations: empty and non-empty screen (or queue).
+                Then, we have two concrete implementations: empty and non-empty screen.
             </p>
 
             <h3>Empty Screen</h3>
@@ -285,7 +320,7 @@ const Content = () => {
             <p>
                 The only important detail is that, when we push component <code>T</code> to it,
                 we receive <code>Screen&lt;T, EmptyScreen&gt;</code>.
-                Notice that a non-empty <code>Screen</code> where the back is <code>EmptyScreen</code> contains one component.
+                This is a screen with one component <code>T</code>.
             </p>
 
             <h3>Non-empty Screen</h3>
@@ -297,13 +332,18 @@ const Content = () => {
             </p>
 
             <p>
-                Consider GAT <code>type PushBack&lt;T&gt; = Screen&lt;F, B::PushBack&lt;T&gt;&gt; whereT: Draw;</code>.
+                Note the implementation of the <code>PushBack</code> GAT.
             </p>
 
-            <ul>
-                <li>Since this is a queue, we keep the front <code>F</code> in the front.</li>
-                <li>Since the back <code>B</code> is also a <code>StScreen</code>, we can call <code>B::PushBack&lt;T&gt;</code> to determine the type of the new back.</li>
-            </ul>
+            <Code code={screenPushBack} />
+
+            <div className="seq">
+                <div>Since this is a queue, we want to keep the front <code>F</code> in the front of the new queue as well.</div>
+                <div>
+                    Since the back <code>B</code> is also a <code>StScreen</code>, we can call <code>B::PushBack&lt;T&gt;</code> to determine
+                    type of back of the new queue.
+                </div>
+            </div>
 
             <p>
                 To make it more concrete, consider the following table summarizing concrete types of screens given the types of its components.
@@ -347,12 +387,13 @@ const Content = () => {
             </table>
 
             <p>
-                This is all!
+                This is all we needed!
             </p>
 
             <p>
                 All these concrete types are available to us through one trait and two implementations.
-                This is one of the examples showing the power of GATs.
+                We can incrementally build one type from another very ergonomically which almost feels like working with dynamic types.
+                This is only possible thanks to the power of GATs.
             </p>
 
 
@@ -371,7 +412,7 @@ const Content = () => {
             </p>
 
             <p>
-                This is still useful though.
+                The queue that we can incrementally build has other advantages though.
                 For instance, we can use the type system to create a type-safe
                 generic <Link text="QueueBuilder" href="https://docs.rs/orx-meta/latest/orx_meta/queue/struct.QueueBuilder.html" /> that can be used
                 for any struct.
@@ -392,7 +433,7 @@ const Content = () => {
             <h2>The Idea of Composition</h2>
 
             <p>
-                We bring back the <code>Draw</code> requirement which is central to the composition idea.
+                After the side quest, we bring back the <code>Draw</code> requirement which is central to the composition idea.
             </p>
 
             <p>
@@ -410,7 +451,7 @@ const Content = () => {
             <p>
                 Implementing the common behavior for the empty queue describes what we should do in the absence
                 of any elements.
-                This was straightforward for the screen example, we do nothing when there are not components to draw.
+                This was straightforward for the screen example, we do nothing when there is nothing to draw.
             </p>
 
 
@@ -434,9 +475,29 @@ const Content = () => {
             </p>
 
             <p>
-                If we had three elements instead, the back would be a queue of two elements using this composition definition.
-                Therefore, <code>self.f.draw(); self.b.draw();</code> call would be equivalent to <code>self.f.draw(); self.b.f.draw(); self.b.b.f.draw();</code>.
-                The definition of composition is carried on to any non-empty queue.
+                Recall our implementation.
+            </p>
+
+            <Code code={screenImplDraw} />
+
+            <p>
+                In a two-element queue, the back would be another non-empty queue with a single element.
+                Omitting the <code>self.</code> prefixes, we can inline the <code>b.draw()</code> with <code>b.f.draw(); b.b.draw();</code>.
+                Then, the entire call on two-element queue would be equivalent to <code>f.draw(); b.f.draw(); b.b.draw();</code>.
+                So this call would draw both components, as we intended.
+            </p>
+
+            <p>
+                What if we had three elements instead?
+                We could first inline the call as <code>f.draw(); b.f.draw(); b.b.draw();</code>.
+                Here, <code>b.b</code> is another queue with a single element.
+                We can inline once more to obtain <code>f.draw(); b.f.draw(); b.b.f.draw(); b.b.b.draw();</code>.
+                This would draw the three components, again as intended.
+            </p>
+
+            <p>
+                So once we define what to do with an empty queue and how to compose two elements,
+                we attain the expected behavior for any number of elements in the queue.
             </p>
 
             <h3>Another Example for Composition</h3>
@@ -455,23 +516,24 @@ const Content = () => {
             <Code code={exampleSum} />
 
             <p>
-                Sum of every whole number is trivially itself.
+                Various types of numbers that can be turned into <code>i64</code> can implement <code>Sum</code>,
+                since sum of a single number is itself.
             </p>
 
             <p>
-                Next, we implement <code>sum</code> of the <code>EmptyQueue</code>.
+                Next, we implement <code>Sum</code> for the <code>EmptyQueue</code>.
                 This defines identity as <code>0</code>.
             </p>
 
             <p>
-                Lastly, we implement <code>sum</code> of a non-empty <code>Queue</code> as addition of its front and back.
+                Lastly, we implement <code>Sum</code> for a non-empty <code>Queue</code> as addition of its front and back.
                 This defines composition as the <code>+</code>.
             </p>
 
             <p>
                 Although the usage has a dynamic look and feel, and although the <code>sum</code> implementation of the queue
                 seems recursive; everything is statically dispatched without any recursion.
-                The compiler can actually inline the <code>queue.sum()</code> call as <code>1 + 2 + ... + 7</code>.
+                The compiler can actually inline the <code>queue.sum()</code> call as <code>1 + 2 + ... + 7 + 0</code>.
             </p>
 
 
@@ -532,7 +594,7 @@ const Content = () => {
             </p>
 
             <p>
-                The <code>queue</code> blocks is just naming (i) the statically-typed queue trait, (ii) empty queue struct
+                The <code>queue</code> block is just for naming (i) the statically-typed queue trait, (ii) empty queue struct
                 and (iii) non-empty queue struct.
             </p>
 
@@ -571,9 +633,9 @@ const Content = () => {
             </p>
 
             <p>
-                The idea originated while trying to compose business constraints of route optimization without any performance penalty.
+                The idea was originated while trying to compose business constraints of route optimization without any performance penalty.
                 You may find a <Link text="talk" href="https://orxfun.github.io/talk-composing-zero-cost-abstractions-in-route-optimization/" /> that
-                discusses the critical importance of achieving this goal in achieving an extensible and maintainable solution.
+                discusses the critical importance of zero cost composition in achieving an extensible and maintainable solution.
             </p>
 
             <p>
@@ -618,7 +680,7 @@ struct SelectBox {
 }
 
 impl SelectBox {
-    pub fn new(width: u32, height: u32, options: Vec<String>) -> Self {
+    fn new(width: u32, height: u32, options: Vec<String>) -> Self {
         Self { width, height, options }
     }
 }
@@ -634,15 +696,15 @@ const solutionTraitObjects = `struct Screen {
 }
 
 impl Screen {
-    pub fn new() -> Self {
+    fn new() -> Self {
         Self { components: vec![] }
     }
 
-    pub fn push(&mut self, component: Box<dyn Draw>) {
+    fn push(&mut self, component: Box<dyn Draw>) {
         self.components.push(component);
     }
 
-    pub fn draw(&self) {
+    fn draw(&self) {
         for component in &self.components {
             component.draw();
         }
@@ -682,15 +744,15 @@ struct Screen {
 }
 
 impl Screen {
-    pub fn new() -> Self {
+    fn new() -> Self {
         Self { components: vec![] }
     }
 
-    pub fn push(&mut self, component: Component) {
+    fn push(&mut self, component: Component) {
         self.components.push(component);
     }
 
-    pub fn draw(&self) {
+    fn draw(&self) {
         for component in &self.components {
             component.draw();
         }
@@ -798,7 +860,7 @@ impl StScreen for EmptyScreen {
     }
 }
 
-pub struct Screen<F, B>
+struct Screen<F, B>
 where
     F: Draw,
     B: StScreen,
@@ -962,3 +1024,16 @@ const macro = `orx_meta::define_queue!(
     elements => [ Draw ];
     queue => [ StScreen; EmptyScreen, Screen ];
 );`;
+
+
+const screenPushBack = `type PushBack<T>
+    = Screen<F, B::PushBack<T>>
+where
+    T: Draw;`;
+
+const screenImplDraw = `impl<F: Draw, B: StScreen> Draw for Screen<F, B> {
+    fn draw(&self) {
+        self.f.draw();
+        self.b.draw();
+    }
+}`;
