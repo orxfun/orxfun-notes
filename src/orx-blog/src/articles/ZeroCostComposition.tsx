@@ -25,35 +25,41 @@ const Content = () => {
             </p>
 
             <p>
-                This might sound confusing ｢(ﾟﾍﾟ)
+                Sounds confusing ｢(ﾟﾍﾟ)
             </p>
 
             <p>
-                Let's consider the classical polymorphism problem where
+                Let's consider the classical example on polymorphism.
             </p>
 
             <div className="emphasis">
-                we want to implement a screen that can draw all elements of a heterogeneous collection of components that can be drawn.
+                We want to implement a screen that can draw all elements of a heterogeneous collection of components that can be drawn.
             </div>
 
             <p>
-                Two well-known solutions are the trait object & enum solutions, which are quite different.
+                Two well-known and different solutions are the trait object & enum solutions.
             </p>
 
             <p>
-                This article proposes a third approach, which is even more different :)
+                This article proposes a third approach, which is significantly more different :)
             </p>
 
             <p>
-                Finally, generic associated types (GATs) are relatively recent additions to rust.
-                Most of the time, usage of GATs are considered together with lifetimes as it solves important lifetime-related issues.
-                However, its usage is not limited to lifetimes.&nbsp;
-                <span className="inline-emphasis">GATs are like functions of the type system</span>.
-                The approaches described in this article demonstrates an example of the power of GATs.
+                Before we dive in, a note on the generic associated types (GATs) which is a relatively recent feature of rust type system.
             </p>
 
             <p>
-                Discussed approach is published in the <code>queue</code> module of the <Link text="orx-meta" href="https://crates.io/crates/orx-meta" /> crate.
+                GATs are often considered together with lifetimes.
+                This is because it solves important lifetime-related issues.
+                Even when explaining the initiative, the examples focused on solving lifetime issues,
+                as in this <Link text="amazing article" href="https://rust-lang.github.io/generic-associated-types-initiative/explainer/iterable.html" />.
+                However, its power may go way beyond.&nbsp;
+                <span className="inline-emphasis">GATs are functions of the type system</span> and functions are powerful.
+                The approach described in this article will hopefully be an example of its power.
+            </p>
+
+            <p>
+                Discussed solution is published in the <code>queue</code> module of the <Link text="orx-meta" href="https://crates.io/crates/orx-meta" /> crate.
             </p>
 
             <h2>Another Way to Draw Components on the Screen</h2>
@@ -68,15 +74,18 @@ const Content = () => {
                 <div>The <code>Screen</code> is a collection of components that we can draw.</div>
                 <div>Three methods are required for the screen.</div>
                 <div>
-                    Since screen is sort of a collection, we need <code>new</code> to
-                    create an empty screen and <code>push</code> to add a component to it.
+                    Screen is sort of a collection, so we need <code>new</code> to
+                    create an empty screen and <code>push</code> to add components.
                 </div>
                 <div>The third method <code>draw</code> is related to the common behavior and draws all components on the screen.</div>
             </div>
 
-            <p>We first set up the draw trait and a couple of implementations for the example.</p>
+            <p>We first set up the draw trait and a couple of implementations for demonstration.</p>
 
             <Code code={drawTrait} />
+
+
+
 
             <h2>Approach #1: Trait Objects</h2>
 
@@ -107,16 +116,18 @@ const Content = () => {
                 <div>
                     <p style={{ color: 'red', fontWeight: 'bold', textAlign: 'center' }}>CONS</p>
                     <div className="seq">
-                        <div>Requires heap allocation for components in <code>Box</code>.</div>
+                        <div>Requires heap allocation for each component since they need to be <code>Box</code>ed.</div>
                         <div><code>draw</code> calls of components are virtual; hence, requires dynamic dispatch.</div>
                     </div>
                 </div>
             </div>
 
             <p>
-                When the cons are not critical, we usually prefer this approach due to its simplicity and convenience.
-                Otherwise, we consider the following approach.
+                When the cons are not critical, we usually prefer this approach.
+                It is simple and convenient.
             </p>
+
+            <p>For other cases, we consider the second approach.</p>
 
             <h2>Approach #2: Enums</h2>
 
@@ -137,9 +148,9 @@ const Content = () => {
                             Nevertheless, this is preferable over boxing in most cases.
                         </div>
                         <div>
-                            No virtual method calls.
-                            All of the <code>component.draw()</code> calls are direct method calls.
-                            There still exists runtime branching cost due to potentially large <code>match</code> clause.
+                            No virtual method calls.&nbsp;
+                            <code>component.draw()</code> is a method call.
+                            It might have runtime branching cost due to potentially large <code>match</code> clause.
                             This is still preferable over dynamic dispatch in most cases.
                         </div>
                         <div>
@@ -160,52 +171,56 @@ const Content = () => {
                         </div>
                         <div>
                             Some boilerplate involved in <code>Component::draw</code> implementation.
-                            The <code>match</code> statement gets longer and longer as we define more variants.
-                            However, crates such as <Link text="enum_dispatch" href="https://crates.io/crates/enum_dispatch" /> let us overcome this issue 🚀
+                            The <code>match</code> statement gets larger and larger as we define more variants.
+                            Thankfully, crates such as <Link text="enum_dispatch" href="https://crates.io/crates/enum_dispatch" /> let us overcome this issue 🚀
                         </div>
                     </div>
                 </div>
             </div>
 
+            <p>Notice that we end up with significantly different properties.</p>
+
             <p>
-                Notice that this implementation has significantly different properties.
+                One thing in common though: in both solutions, we have a simple collection type, a <code>Vec</code>.
+                We will change this in the third approach.
             </p>
+
+
+
 
             <h2>Approach #3: Zero Cost Compositions</h2>
 
-            <p>
-                How about a completely different third approach?
-            </p>
+            <p>As mentioned before, this will be a completely different approach.</p>
 
-            <p>
-                We will first see the solution in the following code block.
-                Due to use of the <Link text="define_queue" href="https://docs.rs/orx-meta/latest/orx_meta/macro.define_queue.html" /> macro,
-                it will not be clear at first.
-                Then, we will dive into details which will demonstrate the power of <strong>generic associated types (GAT)</strong>.
-                We will also discuss what we cannot represent the composition within the type system and why we need the macro.
-            </p>
+            <div className="seq">
+                <div>
+                    We will first see the solution in the following code block.
+                    Due to use of the <Link text="define_queue" href="https://docs.rs/orx-meta/latest/orx_meta/macro.define_queue.html" /> macro,
+                    it will not be clear at first.
+                </div>
+                <div>Then, we will see the expansion, dive into details and discuss how GATs make it possible.</div>
+                <div>Finally, we will discuss what we cannot represent and why we need the macro.</div>
+            </div>
 
-            <p>
-                But for now, knowing the following would be sufficient:
-            </p>
+            <p>For now, knowing the following will be helpful:</p>
 
             <ul>
                 <li><code>StScreen</code> is a trait representing statically typed queue of heterogeneous components 「(°ヘ°)</li>
-                <li><code>EmptyScreen</code> and non-empty <code>Screen</code> structs are the two implementations, they are self-explanatory.</li>
+                <li><code>EmptyScreen</code> and non-empty <code>Screen</code> structs are the two <code>StScreen</code> implementations.</li>
                 <li>The screen, or queue of components, can only have elements that implement <code>Draw</code>.</li>
             </ul>
 
+            <p>Note that queue is the general term, while screen is used for this example; they are often used interchangeable in this article.</p>
+
             <p>
-                Lastly, in addition to elements of the queue, or the components on the screen,&nbsp;
+                Lastly, in addition to  components on the screen,&nbsp;
                 <span className="inline-emphasis">we require both empty and non-empty screen to implement Draw</span>.
                 This is the key idea behind zero-cost compositions.
             </p>
 
             <Code code={solutionComposition} />
 
-            <p>
-                Looks ergonomic, similar to the previous solutions.
-            </p>
+            <p>Looks concise and ergonomic, similar to the previous solutions.</p>
 
             <div style={{ display: "grid", gridTemplateColumns: '1fr 1fr', }}>
                 <div>
@@ -216,13 +231,18 @@ const Content = () => {
                         </div>
                         <div>
                             No heap allocation required for the components.
-                            Further, there is not even an allocation for a <code>Vec</code>.
+                            There is not even an allocation for a <code>Vec</code>.
                         </div>
                         <div>
                             No virtual method calls, all <code>draw</code> calls are statically dispatched.
                             Further, there is no run-time branching.&nbsp;
                             <code>screen.draw()</code> call can completely be inlined by the compiler
                             as <code>btn1.draw(); btn2.draw(); sbox.draw(); btn3.draw();</code>.
+                        </div>
+                        <div>
+                            No boilerplate code is required.
+                            We only define the <span className="inline-emphasis">identity</span> and <span className="inline-emphasis">composition</span>&nbsp;
+                            definitions of the shared behavior, <code>Draw</code>.
                         </div>
                     </div>
                 </div>
@@ -237,19 +257,23 @@ const Content = () => {
                 </div>
             </div>
 
+
             <p>
                 The con is clear and one of the objectives of the <Link text="orx-meta" href="https://crates.io/crates/orx-meta" /> crate
-                is to overcome this as conveniently as possible.
+                is to overcome the complexity as conveniently as possible.
             </p>
+            <p>On the other hand, it might not be clear how the pros are achieved.</p>
             <p>
-                The pros, on the other hand, might sound confusing.
-                In order to clarify consider the following implementation which is hand-written specifically for a screen with three buttons
+                In order to demonstrate, consider the following implementation which is hand-written specifically for a screen with three buttons
                 and one select-box.
-                It is easy to notice that this solution has the above-mentioned advantages.
-                Under the hood, this is identical to the screen implementation as a statically typed queue.
+                It is easy to notice that this solution attains the above-mentioned pros.
             </p>
 
             <Code code={solutionCompositionHandWritten} />
+
+            <p>Under the hood, this is identical to the screen implementation as a statically typed queue.</p>
+
+            <p>We will see how in the next section.</p>
 
 
 
@@ -257,60 +281,69 @@ const Content = () => {
             <h2>Expansion and the Power of GATs</h2>
 
             <p>
-                You might have figured out that every time we push a component to the screen, we obtain a new concrete screen type.
+                You might have figured out that every time we push a component to the screen, we obtain a new concrete queue type.
             </p>
 
             <p>
-                This screen type is statically-typed in its components.
+                This queue type is statically-typed in its components.
                 Just like an ad-hoc struct.
             </p>
 
-            <p>But how does this work?</p>
+            <p>This works all thanks to the rust-type system and power of GATs 💪</p>
 
-            <p>Thanks to the rust-type system and power of GATs 💪</p>
-
-            <p>
-                To understand better,
-                let's check the expansion of the <Link text="define_queue" href="https://docs.rs/orx-meta/latest/orx_meta/macro.define_queue.html" /> macro.
-            </p>
+            <p>To understand the queue types better, let's check the expanded version of the solution provided above.</p>
 
             <Code code={solutionCompositionExpansion} />
 
             <div className="emphasis">
                 Note the resemblance of <code>push</code> method and <code>PushBack</code> type,&nbsp;
-                <span className="inline-emphasis">GATs are like functions of the type system</span>.
+                <span className="inline-emphasis">GATs are functions of the type system</span>.
             </div>
 
+            <p>Let's check each of the three queue types in detail.</p>
 
-            <h3>Statically-typed Screen Trait</h3>
+
+            <h3 style={{ textAlign: 'left', paddingLeft: '1rem' }}>i. <code>StScreen</code>: the trait for statically-typed queues</h3>
 
             <p>
                 The <code>StScreen</code> trait defines a queue with statically-typed elements and a constant <code>LEN</code>.
             </p>
 
-            <p>Although this is not critical here, it is useful to clarify that this a queue due to the following:</p>
-            <ul>
-                <li>It <code>push</code>es to the back of the queue.</li>
-                <li><code>Front</code> of the queue is an element that can be popped (not discussed here, but in the crate documentation).</li>
-                <li><code>Back</code> is the queue containing elements except for the front element; i.e., resulting queue if the front element is popped.</li>
-            </ul>
-
             <p>
-                Notice the GAT: <code>type PushBack&lt;T&gt;: StScreen where T: Draw;</code> which handles a couple of critical tasks:
-            </p>
-            <ul>
-                <li>It restricts that we can only push types that implement <code>Draw</code>.</li>
-                <li>
-                    It makes sure that the queue obtained by pushing a component to it also implements <code>StScreen</code>.
-                    This means that we can keep calling <code>push</code> since we always get another <code>StScreen</code>.
-                </li>
-            </ul>
-
-            <p>
-                Then, we have two concrete implementations: empty and non-empty screen.
+                Although this is not important for this problem, it is useful to clarify that this a queue.
+                We <code>push</code> to the back of the queue.
+                The <code>Front</code> element can be popped,
+                and <code>Back</code> represents the queue containing the remaining elements when the front element is popped.
+                This is a choice regarding other use cases, we could've chosen a stack or a double-ended queue as well.
             </p>
 
-            <h3>Empty Screen</h3>
+            <p>Most important detail of this trait is the following GAT:</p>
+
+            <Code code={stScreenPushBack} />
+
+            <p><code>PushBack&lt;T&gt;</code> is the concrete type we obtain if we push an element of type <code>T</code> to this queue.</p>
+
+            <div className="seq">
+
+                <div>Firstly, the condition <code>T: Draw</code> ensures that our queue may contain heterogeneous types, but they can only be <code>Draw</code> types.</div>
+
+                <div>
+                    Secondly, whatever the type we get by pushing <code>T</code> to the queue, it also has to implement <code>StScreen</code>, the trait itself.
+                    This has <span className="inline-emphasis">the most useful consequence</span>.
+                    It means that we can call <code>PushBack</code> on the resulting type;
+                    and then we can call <code>PushBack</code> on the resulting type;
+                    and then we can call <code>PushBack</code> on the resulting type;
+                    ♾️.
+                    We will always get another queue.
+                </div>
+
+            </div>
+
+            <p>Now, all we need is two concrete implementations: one for empty queue and one non-empty.</p>
+
+
+
+            <h3 style={{ textAlign: 'left', paddingLeft: '1rem' }}>ii. Empty queue</h3>
 
             <p>
                 This can be considered as the <code>Nil</code> of our queue.
@@ -320,33 +353,42 @@ const Content = () => {
             <p>
                 The only important detail is that, when we push component <code>T</code> to it,
                 we receive <code>Screen&lt;T, EmptyScreen&gt;</code>.
-                This is a screen with one component <code>T</code>.
+                This is a screen with one component which is of type <code>T</code>.
             </p>
 
-            <h3>Non-empty Screen</h3>
+
+
+            <h3 style={{ textAlign: 'left', paddingLeft: '1rem' }}>iii. Non-empty queue</h3>
 
             <p>
-                The <code>Screen</code> is a queue that is guaranteed to have at least one element that is the <code>Front</code>.
+                The <code>Screen</code> is a queue that has at least one element which is at the <code>Front</code>.
                 The back might be an <code>EmptyScreen</code> or another non-empty <code>Screen</code>.
-                Therefore, this struct can represent non-empty screens with any number of components.
+                Therefore, this struct can represent non-empty queues with any number of elements.
             </p>
 
-            <p>
-                Note the implementation of the <code>PushBack</code> GAT.
-            </p>
+            <p>See the implementation of the <code>PushBack</code> GAT.</p>
 
             <Code code={screenPushBack} />
 
             <div className="seq">
+                <div>
+                    It is straightforward to see that the resulting type must be a non-empty <code>Screen</code> since we are pushing an element
+                    to the current queue.
+                </div>
                 <div>Since this is a queue, we want to keep the front <code>F</code> in the front of the new queue as well.</div>
                 <div>
-                    Since the back <code>B</code> is also a <code>StScreen</code>, we can call <code>B::PushBack&lt;T&gt;</code> to determine
-                    type of back of the new queue.
+                    Back of the current queue <code>B</code> is also a queue; i.e., <code>StScreen</code>.
+                    This allows us to call <code>B::PushBack&lt;T&gt;</code> to determine type of back of the new queue.
+                </div>
+                <div>
+                    Combining these two, we obtain a new <code>Screen</code> where the front remains to be <code>F</code> and
+                    the back is determined by <code>B::PushBack&lt;T&gt;</code>.
                 </div>
             </div>
 
             <p>
-                To make it more concrete, consider the following table summarizing concrete types of screens given the types of its components.
+                To make it more concrete, consider the following table summarizing concrete types of queues
+                up to four elements, given the types of its elements.
             </p>
 
             <table>
@@ -386,14 +428,13 @@ const Content = () => {
                 </tbody>
             </table>
 
-            <p>
-                This is all we needed!
-            </p>
+            <p>This is all we need to represent all statically-typed queues!</p>
+
+            <p>All these concrete types are available to us through one trait and two implementations.</p>
 
             <p>
-                All these concrete types are available to us through one trait and two implementations.
                 We can incrementally build one type from another very ergonomically which almost feels like working with dynamic types.
-                This is only possible thanks to the power of GATs.
+                ❤️ GATs!
             </p>
 
 
@@ -401,30 +442,27 @@ const Content = () => {
 
             <h2>Side Quest, a Generic Builder for Any Struct</h2>
 
+            <p>Consider what we would have we removed the <code>Draw</code> requirement from elements and queues.</p>
+
+            <p>We would end up with a statically-typed queue of <span className="inline-emphasis">anything</span>. This is an ad-hoc struct.</p>
+
+            <p>We already have tuples for this.</p>
+
             <p>
-                Consider what would happen if we removed the <code>Draw</code> requirement in the expansion above.
-                We would end up with a statically-typed queue of anything.
-                This is an ad-hoc struct.
+                However, incremental build capability of queues come in handy.
+                For instance, it allows us to create a generic&nbsp;
+                <Link text="QueueBuilder" href="https://docs.rs/orx-meta/latest/orx_meta/queue/struct.QueueBuilder.html" /> that we can use for any struct.
+                Since the queues are statically-typed in its elements,
+                the builder prevents calling <code>push</code> with wrong types or in wrong order,
+                and prevents us from <code>finish</code>ing early or late.
             </p>
 
             <p>
-                We already have tuples for this.
-            </p>
-
-            <p>
-                The queue that we can incrementally build has other advantages though.
-                For instance, we can use the type system to create a type-safe
-                generic <Link text="QueueBuilder" href="https://docs.rs/orx-meta/latest/orx_meta/queue/struct.QueueBuilder.html" /> that can be used
-                for any struct.
+                This was not the main focus. You may you may find the details&nbsp;
+                <Link text="here" href="https://github.com/orxfun/orx-meta/blob/main/docs/2_generic_builder.md" /> if you are interested.
             </p>
 
             <Code code={genericQueueBuilder} />
-
-            <p>
-                This was not the main goal but if you are interested, you may find the details&nbsp;
-                <Link text="here" href="https://github.com/orxfun/orx-meta/blob/main/docs/2_generic_builder.md" />.
-            </p>
-
 
 
 
@@ -432,30 +470,29 @@ const Content = () => {
 
             <h2>The Idea of Composition</h2>
 
+            <p>After the side quest, we bring back the <code>Draw</code> requirement.</p>
+
             <p>
-                After the side quest, we bring back the <code>Draw</code> requirement which is central to the composition idea.
+                We do not want a queue of anything.
+                We want a queue of things that share a common behavior.
+                This is central to the composition idea.
             </p>
 
             <p>
-                It represents the common behavior of elements of the queue.
-                We only allow to push elements implementing this trait.
-            </p>
-
-            <p>
-                Furthermore, we require empty and non-empty queues to implement the common behavior.
+                In addition to elements of the queue,&nbsp;
+                <span className="inline-emphasis"> we require the queue itself to implement the common behavior</span>.
                 This is how we achieve zero-cost composition.
             </p>
 
-            <h3>Draw for empty Queue, Identity</h3>
+            <h3 style={{ textAlign: 'left', paddingLeft: '1rem' }}>Identity: Draw for empty Queue</h3>
 
             <p>
-                Implementing the common behavior for the empty queue describes what we should do in the absence
-                of any elements.
-                This was straightforward for the screen example, we do nothing when there is nothing to draw.
+                Implementing the common behavior for the empty queue describes what we should do in the absence of any elements.
+                This is straightforward for the screen example, we do nothing when there is nothing to draw.
             </p>
 
 
-            <h3>Draw for non-empty Queue, Composition</h3>
+            <h3 style={{ textAlign: 'left', paddingLeft: '1rem' }}>Composition: Draw for non-empty Queue</h3>
 
             <p>
                 Implementing the common behavior for the non-empty queue describes what we should do when there are multiple
@@ -471,7 +508,7 @@ const Content = () => {
                 To make it easier, let's assume the back is a queue of a single element.
                 In other words, our queue has two elements.
                 What should <code>draw</code> do in this case?
-                We should probably draw both of them.
+                It seems sensible to draw both of them.
             </p>
 
             <p>
@@ -481,24 +518,29 @@ const Content = () => {
             <Code code={screenImplDraw} />
 
             <p>
-                In a two-element queue, the back would be another non-empty queue with a single element.
-                Omitting the <code>self.</code> prefixes, we can inline the <code>b.draw()</code> with <code>b.f.draw(); b.b.draw();</code>.
-                Then, the entire call on two-element queue would be equivalent to <code>f.draw(); b.f.draw(); b.b.draw();</code>.
-                So this call would draw both components, as we intended.
+                When we have two elements, our queue type is <code>Screen&lt;C1, Screen&lt;C2, EmptyScreen&gt;&gt;</code>.
+                Omitting the <code>self.</code> for brevity, we would have <code>f: C1</code>, <code>b: Screen&lt;C2, EmptyScreen&gt;</code>.
+                We can substitute <code>b.draw()</code> with <code>b.f.draw()</code> and <code>b.b.draw()</code>.
+                Since <code>b.b</code> is an empty queue, we would not go any deeper.
+                Therefore, the draw call on a two element queue could be inlined as <code>f.draw(); b.f.draw(); b.b.draw();</code>.
+                Since the last draw call on empty screen does nothing, this method would draw two of our components.
+                This is the expected behavior.
             </p>
 
             <p>
-                What if we had three elements instead?
-                We could first inline the call as <code>f.draw(); b.f.draw(); b.b.draw();</code>.
-                Here, <code>b.b</code> is another queue with a single element.
-                We can inline once more to obtain <code>f.draw(); b.f.draw(); b.b.f.draw(); b.b.b.draw();</code>.
-                This would draw the three components, again as intended.
+                Notice that everything would work exactly the same if we had a queue of three elements; i.e., <code>Screen&lt;C1, Screen&lt;C2, Screen&lt;C3, EmptyScreen&gt;&gt;&gt;</code>.
+                Our inlining would only go one more level until we reach the empty queue and we would end up with <code>f.draw(); b.f.draw(); b.b.f.draw(); b.b.b.draw();</code>.
+                This would draw three of the components, again the expected behavior.
             </p>
 
             <p>
-                So once we define what to do with an empty queue and how to compose two elements,
+                Therefore, once we define what to do with an empty queue and how to compose two elements,
                 we attain the expected behavior for any number of elements in the queue.
             </p>
+
+
+
+
 
             <h3>Another Example for Composition</h3>
 
@@ -508,17 +550,14 @@ const Content = () => {
             </p>
 
             <p>
-                To understand the flexibility of the approach, we need a second example.
+                A second example might help demonstrate the power of composition.
                 Assume that we want a queue of whole numbers with different concrete types.
                 Our shared behavior is <code>Sum</code>.
             </p>
 
             <Code code={exampleSum} />
 
-            <p>
-                Various types of numbers that can be turned into <code>i64</code> can implement <code>Sum</code>,
-                since sum of a single number is itself.
-            </p>
+            <p>Numbers which can be turned into <code>i64</code> can implement <code>Sum</code>, since sum of a single number is itself.</p>
 
             <p>
                 Next, we implement <code>Sum</code> for the <code>EmptyQueue</code>.
@@ -526,13 +565,13 @@ const Content = () => {
             </p>
 
             <p>
-                Lastly, we implement <code>Sum</code> for a non-empty <code>Queue</code> as addition of its front and back.
+                Finally, we implement <code>Sum</code> for a non-empty <code>Queue</code> as addition of its front and back.
                 This defines composition as the <code>+</code>.
             </p>
 
             <p>
-                Although the usage has a dynamic look and feel, and although the <code>sum</code> implementation of the queue
-                seems recursive; everything is statically dispatched without any recursion.
+                The usage might look dynamic and <code>sum</code> implementation might seem recursive.
+                However, everything is statically dispatched without any recursion.
                 The compiler can actually inline the <code>queue.sum()</code> call as <code>1 + 2 + ... + 7 + 0</code>.
             </p>
 
@@ -541,51 +580,43 @@ const Content = () => {
 
 
 
-
-
             <h2>Why do we need the macro?</h2>
+
+            <p>It felt so close to represent this without macros, but no luck ~( ´•︵•` )~</p>
 
             <p>
                 <Link text="orx-meta" href="https://crates.io/crates/orx-meta" /> crate provides the <code>StQueue</code> trait together with&nbsp;
-                <code>EmptyQueue</code> and <code>Queue</code> implementations, naturally without the requirement on elements to be <code>Draw</code>.
+                <code>EmptyQueue</code> and <code>Queue</code> implementations.
+                This implementation naturally does not have the requirement on elements to be <code>Draw</code>; and hence,
+                represents the <span className="inline-emphasis">statically-typed queue of anything</span>.
+                As explained in the builder side quest, this can still be useful.
             </p>
 
-            <p>
-                As explained in the side quest, this can still be useful.
-            </p>
+            <p>But the queue is most useful when it is coupled with a shared behavior of heterogeneous types.</p>
 
-            <p>
-                But the queue is most useful when it is coupled with a shared behavior of heterogeneous types.
-            </p>
-
-            <p>
-                Therefore, what we actually need is the following.
-            </p>
+            <p>To achieve this, what we actually need is something like the following.</p>
 
             <Code code={wontCompile} />
 
             <p>
                 Notice that if we substitute <code>X</code> with <code>Draw</code> we obtain our <code>StScreen</code> trait.
+                In another use case, we can replace it with <code>Component</code>, or <code>Rule</code>, or whichever shared behavior we are working with.
             </p>
 
-            <p>
-                So here, <code>X</code> is a trait.
-                We need our <code>StQueue</code> trait to be generic over another trait.
-            </p>
+            <p>In other words, <code>X</code> here is a trait, or I should say any trait.</p>
 
-            <p>
-                This won't compile today (⌣_⌣”)
-            </p>
+            <p>We need our <code>StQueue</code> trait to be generic over another trait.</p>
 
-            <p>
-                Please let <Link text="me" href="mailto:orx.ugur.arikan@gmail.com" /> know if you can represent this 😊
-            </p>
+            <p>This won't compile today (⌣_⌣”)</p>
 
-            <p>
-                So what do we do when we cannot represent our solution within the type system where the fix seems to be as simple
-                as a string substitution?
-                Macros to the rescue ＼（＾▽＾）／
-            </p>
+            <p>For now, I used the escape patch.</p>
+
+            <ul>
+                <li>We cannot represent our solution within the type system.</li>
+                <li>Abstraction seems to be as simple as a string substitution.</li>
+            </ul>
+
+            <p>This is one of the easy cases for <code>macro_rules!</code></p>
 
             <Code code={macro} />
 
@@ -594,7 +625,7 @@ const Content = () => {
             </p>
 
             <p>
-                The <code>queue</code> block is just for naming (i) the statically-typed queue trait, (ii) empty queue struct
+                The <code>queue</code> block is just giving names to (i) the statically-typed queue trait, (ii) empty queue struct
                 and (iii) non-empty queue struct.
             </p>
 
@@ -604,9 +635,9 @@ const Content = () => {
             </p>
 
             <p>
-                Then, all the macro expansion does is to define the queue types exactly as they are defined in the <Link text="orx-meta" href="https://crates.io/crates/orx-meta" /> crate
-                with only one difference.
-                It adds the <code>Draw</code> requirement to elements of the queues and to the queues themselves.
+                Then, the macro defines the queue types exactly as we saw in the expansion with only one difference.
+                It adds the traits listed in <code>elements</code> as requirements to elements of the queues,
+                and it requires the queues to implement these traits themselves.
             </p>
 
 
@@ -614,35 +645,36 @@ const Content = () => {
 
             <h2>Summary</h2>
 
+            <p>This pattern is very powerful for composing zero-cost abstractions.</p>
+
+            <p>Especially for performance critical programs, as it allows us to avoid dynamic dispatch, heap allocation and run-time branching all together.</p>
+
+            <p>On the downside, the approach involves more complex types with generic parameters than alternative solutions.</p>
+
             <p>
-                This pattern is very powerful for composing zero-cost abstractions.
+                Using the queues is still convenient though :)
+                GATs make working with statically-typed queues feel like we are in a dynamic language.
             </p>
 
             <p>
-                Especially for performance critical programs, it allows us to avoid dynamic dispatch, heap allocation and run-time branching.
+                I first started experimenting with GATs for composing business constraints for a performance-critical route optimization library.
+                If you are interested, you may check a relevant <Link text="talk" href="https://orxfun.github.io/talk-composing-zero-cost-abstractions-in-route-optimization/" /> where
+                we discuss the critical importance of zero cost composition.
+                Actually, it seems to be the only way to achieve <span className="inline-emphasis">performant, extensible and maintainable solution at the same time</span>.
             </p>
 
             <p>
-                Although this approach involves more complex types with generic parameters,
-                the complexity is kept limited with one trait and two structs.
+                The possibility of zero-cost composition allows us to focus and work on each feature in isolation
+                because we know that each feature will compose nicely without loss of performance.
             </p>
+
+            <p>This is why the approach is generalized in the <Link text="orx-meta" href="https://crates.io/crates/orx-meta" /> crate.</p>
 
             <p>
-                Furthermore, using the queue is comparably convenient.
-                Thanks to GATs, usage feels very dynamic, while the queue is strongly typed.
+                Nevertheless, the idea is still very young, at least to me.
+                Feel free to contact <Link text="me" href="mailto:orx.ugur.arikan@gmail.com" /> to share your thoughts and experience
+                (certainly contact me if you find a macro-free solution 🫶).
             </p>
-
-            <p>
-                The idea was originated while trying to compose business constraints of route optimization without any performance penalty.
-                You may find a <Link text="talk" href="https://orxfun.github.io/talk-composing-zero-cost-abstractions-in-route-optimization/" /> that
-                discusses the critical importance of zero cost composition in achieving an extensible and maintainable solution.
-            </p>
-
-            <p>
-                Further, similar ideas are used in the generic <Link text="orx-local-search" href="https://crates.io/crates/orx-local-search" /> crate
-                which aims to establish a local search framework that allows flexible constraint and objective definitions without loss of performance.
-            </p>
-
 
             <div className="end-space"></div>
         </>
@@ -791,7 +823,7 @@ let screen = EmptyScreen::new()
     .push(Button::new(6, 6, "login".to_string()));
 screen.draw();`;
 
-const solutionCompositionHandWritten = `struct Screen { // no heap allocation
+const solutionCompositionHandWritten = `struct Screen { // no heap allocation, no Vec
     btn1: Button,
     btn2: Button,
     sbox: SelectBox,
@@ -815,7 +847,8 @@ let screen = Screen {
 };
 screen.draw();`;
 
-const solutionCompositionExpansion = `trait StScreen: Draw {
+const solutionCompositionExpansion = `// expansion of the macro
+trait StScreen: Draw {
     type PushBack<T>: StScreen
     where
         T: Draw;
@@ -895,6 +928,8 @@ where
         }
     }
 }
+
+// remaining is same as above
 
 impl Draw for EmptyScreen {
     // identity: do nothing
@@ -1025,6 +1060,10 @@ const macro = `orx_meta::define_queue!(
     queue => [ StScreen; EmptyScreen, Screen ];
 );`;
 
+
+const stScreenPushBack = `type PushBack<T>: StScreen
+where
+    T: Draw;`;
 
 const screenPushBack = `type PushBack<T>
     = Screen<F, B::PushBack<T>>
