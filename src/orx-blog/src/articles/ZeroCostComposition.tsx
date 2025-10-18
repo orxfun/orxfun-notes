@@ -29,7 +29,7 @@ const Content = () => {
             </p>
 
             <p>
-                Let's consider the classical example on polymorphism.
+                To demonstrate, let's consider the classical example on polymorphism.
             </p>
 
             <div className="emphasis">
@@ -124,7 +124,7 @@ const Content = () => {
 
             <p>
                 When the cons are not critical, we usually prefer this approach.
-                It is simple and convenient.
+                It is simple, convenient and dynamic.
             </p>
 
             <p>For other cases, we consider the second approach.</p>
@@ -182,13 +182,13 @@ const Content = () => {
 
             <p>
                 One thing in common though: we use a <code>Vec</code> to store the components.
-                We will change this in the third approach.
+                This will change in the third approach.
             </p>
 
 
 
 
-            <h2>Approach #3: Zero Cost Compositions</h2>
+            <h2>Approach #3: Statically-Typed Queue and Zero Cost Composition</h2>
 
             <p>As mentioned before, this will be a completely different approach.</p>
 
@@ -220,8 +220,6 @@ const Content = () => {
 
             <Code code={solutionComposition} />
 
-            <p>Looks concise and ergonomic, similar to the previous solutions.</p>
-
             <div style={{ display: "grid", gridTemplateColumns: '1fr 1fr', }}>
                 <div>
                     <p style={{ color: 'lime', fontWeight: 'bold', textAlign: 'center', }}>PROS</p>
@@ -250,18 +248,27 @@ const Content = () => {
                     <p style={{ color: 'red', fontWeight: 'bold', textAlign: 'center', }}>CONS</p>
                     <div className="seq">
                         <div>
-                            <code>Screen</code> is a new type specific to the <code>Draw</code> trait, it has two generic parameters and it is more complex than
-                            the <code>Vec</code> wrappers used in the previous approaches.
+                            <code>Screen</code> with generic parameters is a more complicated type than the <code>Vec</code> wrappers used in the previous approaches.
+                            On the other hand, we can conveniently work with it without needing its concrete type since it can be used as <code>impl Draw</code>.
+                        </div>
+                        <div>
+                            More importantly, it is statically-typed.
+                            This means that concrete types of all of its elements must be known at the compile time.
                         </div>
                     </div>
                 </div>
             </div>
 
 
-            <p>The con is clear and one of the objectives of this approach is to overcome the complexity as conveniently as possible.</p>
-            <p>On the other hand, it might not be clear how the pros are achieved.</p>
             <p>
-                In order to demonstrate, consider the following implementation which is hand-written specifically for a screen with three buttons
+                The queue has nice properties due to being statically-typed,
+                but on the other hand, this brings serious limitations on where it can be used.
+                We will discuss potential use cases later.
+            </p>
+
+            <p>Let's first clarify the pros.</p>
+            <p>
+                Consider the following implementation which is hand-written specifically for a screen with three buttons
                 and one select-box.
                 It is easy to notice that this solution attains the above-mentioned pros.
             </p>
@@ -317,21 +324,20 @@ const Content = () => {
 
             <div className="seq">
 
-                <div>Firstly, the condition <code>T: Draw</code> ensures that our queue may contain heterogeneous types, but they can only be <code>Draw</code> types.</div>
+                <div>Firstly, the condition <code>T: Draw</code> ensures that our queue may only contain <code>Draw</code> types.</div>
 
                 <div>
                     Secondly, whatever the type we get by pushing <code>T</code> to the queue, it also has to implement <code>StScreen</code>, the trait itself.
                     This has <span className="inline-emphasis">the most useful consequence</span>.
                     It means that we can call <code>PushBack</code> on the resulting type;
                     and then we can call <code>PushBack</code> on the resulting type;
-                    and then we can call <code>PushBack</code> on the resulting type;
-                    ♾️.
+                    ... (♾️ or 256?).
                     We will always get another queue.
                 </div>
 
             </div>
 
-            <p>Now, all we need is two concrete implementations: one for empty queue and one non-empty.</p>
+            <p>Now, all we need is two concrete implementations: one for empty queue and one for non-empty.</p>
 
 
 
@@ -339,11 +345,7 @@ const Content = () => {
 
             <p>
                 This can be considered as the <code>Nil</code> of our queue.
-                There is nothing special about its <code>StScreen</code> implementation.
-            </p>
-
-            <p>
-                The only important detail is that, when we push component <code>T</code> to it,
+                The only important detail here is that, when we push component <code>T</code> to it,
                 we receive <code>Screen&lt;T, EmptyScreen&gt;</code>.
                 This is a screen with one component which is of type <code>T</code>.
             </p>
@@ -424,10 +426,6 @@ const Content = () => {
 
             <p>All these concrete types are available to us through one trait and two implementations.</p>
 
-            <p>
-                We can incrementally build one type from another very ergonomically which almost feels like working with dynamic types.
-                ❤️ GATs!
-            </p>
 
 
 
@@ -450,7 +448,7 @@ const Content = () => {
             </p>
 
             <p>
-                This was not the main focus. You may you may find the details&nbsp;
+                You may you may find the details&nbsp;
                 <Link text="here" href="https://github.com/orxfun/orx-meta/blob/main/docs/2_generic_builder.md" /> if you are interested.
             </p>
 
@@ -533,53 +531,57 @@ const Content = () => {
 
 
 
-            <h3>Another Example for Composition</h3>
+            <h3>Another Example, Composing Business Criteria</h3>
 
             <p>
                 We can define different ways to compose elements sharing a common behavior depending on the use case.
-                In the <code>Draw</code> example, we simply draw all components one after the other.
-            </p>
-
-            <p>
                 A second example might help demonstrate the power of composition.
-                Assume that we want a queue of whole numbers with different concrete types.
-                Our shared behavior is <code>Sum</code>.
-            </p>
-
-            <Code code={exampleSum} />
-
-            <p>Numbers which can be turned into <code>i64</code> can implement <code>Sum</code>, since sum of a single number is itself.</p>
-
-            <p>
-                Next, we implement <code>Sum</code> for the <code>EmptyQueue</code>.
-                This defines identity as <code>0</code>.
             </p>
 
             <p>
-                Finally, we implement <code>Sum</code> for a non-empty <code>Queue</code> as addition of its front and back.
-                This defines composition with the <code>+</code> operator.
+                Assume that we are evaluating vehicle tours with respect to different business criteria.
+                Our shared behavior is the <code>Criterion</code> trait.
+                Its <code>evaluate</code> method takes the <code>tour</code> to evaluate and <code>previous_status</code> of the tour,
+                and returns the new status.
             </p>
 
             <p>
-                The usage might look dynamic and <code>sum</code> implementation might seem recursive.
-                However, everything is statically dispatched without any recursion.
-                The compiler can actually inline the <code>queue.sum()</code> call as <code>1 + 2 + ... + 7 + 0</code>.
+                In real life, different operations and different regions might have different sets of criteria.
+                In the example below, we have three relevant criteria: <code>Distance</code>, <code>Capacity</code> and <code>Precedence</code>.
+            </p>
+
+            <p>
+                We again define our criteria queue with the <code>define_queue</code> macro.
+            </p>
+
+            <p>
+                Then, we implement <code>Criterion</code> for our empty queue, <code>EmptyCriteria</code>.
+                It just returns back the <code>previous_state</code>.
+                This is the identity behavior of evaluation.
+            </p>
+
+            <p>
+                Finally, we implement <code>Criterion</code> for the non-empty queue, <code>Criteria</code>.
+                Here, we first evaluate the tour with respect to the first criterion in the front.
+                Then, we pass on the resulting status to the back of the queue to evaluate.
+                This is the composition.
             </p>
 
 
+            <Code code={exampleCriteria} />
 
 
 
 
             <h2>Why do we need the macro?</h2>
 
-            <p>It felt so close to represent this without macros, but no luck ~( ´•︵•` )~</p>
+            <p>It felt so close to represent this pattern without macros, but no luck ~( ´•︵•` )~</p>
 
             <p>
                 orx-meta crate provides the <code>StQueue</code> trait together with&nbsp;
                 <code>EmptyQueue</code> and <code>Queue</code> implementations.
-                Naturally, these default implementations do not have the requirement on elements to be <code>Draw</code>,
-                so they define <span className="inline-emphasis">statically-typed queue of anything</span>.
+                Naturally, these default implementations do not have the requirement on elements to be <code>Draw</code> or <code>Criterion</code>.
+                Therefore, they define <span className="inline-emphasis">statically-typed queue of anything</span>.
                 As explained in the builder side quest, this can still be useful.
             </p>
 
@@ -590,8 +592,8 @@ const Content = () => {
             <Code code={wontCompile} />
 
             <p>
-                Notice that if we substitute <code>X</code> with <code>Draw</code> we obtain the <code>StScreen</code> trait in our example.
-                In another use case, we can replace it with <code>Component</code>, or <code>Rule</code>, or whichever shared behavior we are working with.
+                If we substitute <code>X</code> with <code>Draw</code> we obtain the <code>StScreen</code> trait in our example,
+                if we substitute with <code>Criterion</code> we get <code>StCriteria</code>.
             </p>
 
             <p><code>X</code> here is a trait, or I should say, it can be any trait.</p>
@@ -635,36 +637,131 @@ const Content = () => {
 
 
 
-            <h2>Summary</h2>
 
-            <p>This pattern is very powerful for composing zero-cost abstractions.</p>
 
-            <p>Especially for performance critical programs, as it allows us to avoid dynamic dispatch, heap allocation and run-time branching all together.</p>
 
-            <p>On the downside, the approach involves more complex types with generic parameters than alternative solutions.</p>
+            <h2>Limitations and Use Cases</h2>
+
+            <p>As mentioned in the cons, having statically-typed elements limits potential use cases of the queue.</p>
+
+            <p>In the following, we discuss two use cases where this pattern can be utilized.</p>
+
+
+
+
+            <h3 style={{ textAlign: 'left', paddingLeft: '1rem' }}>A. As a Collection, <code>Draw</code> Example</h3>
 
             <p>
-                However, using the queues is still convenient.
-                GATs make working with statically-typed queues look like a dynamic language.
+                Although it is statically-typed, we can still use the queue as a collection, as in the <code>Draw</code> example.
+                But recall that we have to know types of all elements during compile time.
             </p>
+
+            <p>This fits to situations where we instantiate the collection during the <span className="inline-emphasis">start up</span> of a service.</p>
+
+            <p>
+                We often parse configuration files into the collection.
+                For instance, we can have a json file listing components to be included in the screen.
+            </p>
+
+            <p>This means that we know the types of all components, we can also use the statically-typed queue.</p>
+
+            <p>
+                In the following, we a screen initialization as a vector of trait objects parsed from a json file on the left,
+                and as a statically-typed queue on the right.
+            </p>
+
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
+                <Code code={startupTraitObjects} />
+                <Code code={startupQueue} />
+            </div>
+
+            <p>
+                Whenever configuration changes, we must re-compile with the queue approach.
+                On the other hand, initialization can never fail.
+            </p>
+
+            <p>Further, the queue brings performance and memory advantages.</p>
+
+            <p>
+                For a screen containing 200 components with toy draw implementations, statically-typed queue approach is two times faster than
+                trait objects or enum-components approaches.
+                You may see the corresponding benchmarks <Link text="here" href="https://github.com/orxfun/orx-meta/tree/main/benches" />.
+            </p>
+
+            <p>Further, being memory efficient and not requiring heap allocation makes it beneficial for embedded applications.</p>
+
+            <p>
+                We must, however, be careful about the queue size.
+                As far as I experienced, the compiler does not seem happy for queues with more than 256 elements ●﹏●
+            </p>
+
+
+
+
+
+            <h3 style={{ textAlign: 'left', paddingLeft: '1rem' }}>B. Tool to deal with Custom Requirements, <code>Criteria</code> Example</h3>
+
+            <p>This has been the main idea to develop the queues for.</p>
+
+            <p>
+                Assume that we are maintaining a performance-critical tool with with, say, <code>5</code> features.
+                We want our tool to be useful for as many use cases as possible.
+                Every use case requires a different subset of our features.
+                There exist <code>2^5-1 = 31</code> potential use cases.
+                How can we cover them all?
+            </p>
+
+            <p>
+                We will not have fun if we need to manually combine the features;
+                or if we lose performance due to abstraction.
+            </p>
+
+            <p>On the other hand, if we can define the composition of these features using a statically-typed queue:</p>
+
+            <div className="seq">
+                <div>We can work on and maintain each feature in isolation.</div>
+                <div>
+                    Implementing the <code>6</code>-th feature allows us cover <code>32</code> more potential use cases,
+                    making it well-worth the effort.
+                </div>
+                <div>And we will have access to all combinations of these features without any manual work and without loss of performance.</div>
+            </div>
+
+            <p>
+                Recall the example for evaluating vehicle tours, where we implemented three criteria.
+                The following demonstrates how we can use them in four different use cases.
+            </p>
+
+            <Code code={criteriaCombinations} />
+
+
+
+
+
+
+
+
+
+            <h2>Summary</h2>
+
+            <p>This pattern is powerful for composing zero-cost abstractions.</p>
+
+            <p>Although, having to know types of elements in compile time limits its use cases, there are situations that we can benefit from it.</p>
+
+            <p>Especially in performance critical programs since it allows us to avoid dynamic dispatch, heap allocation and run-time branching all together.</p>
+
 
             <p>
                 I first started experimenting with GATs for composing business constraints and objectives for a performance-critical route optimization library.
                 If you are interested, you may check a relevant <Link text="talk" href="https://orxfun.github.io/talk-composing-zero-cost-abstractions-in-route-optimization/" />&nbsp;
                 discussing the importance of zero cost composition.
                 Actually, it seems to be the only way to achieve a <span className="inline-emphasis">performant, extensible and maintainable solution at the same time</span>.
+                The generalization led to the queue explained here, and seems like I will be using it more for algorithm abstractions such as the local search.
             </p>
 
             <p>
-                The possibility of zero-cost composition allows us to focus and work on each feature in isolation
-                because we know that each feature will compose nicely without loss of performance.
-            </p>
-
-            <p>This is why the approach is generalized in the <Link text="orx-meta" href="https://crates.io/crates/orx-meta" /> crate.</p>
-
-            <p>
-                Nevertheless, the idea is still very young, at least to me.
-                Feel free to contact <Link text="me" href="mailto:orx.ugur.arikan@gmail.com" /> to share your thoughts and experience
+                Nevertheless, the approach is still new, at least to me.
+                Feel free to contact <Link text="me" href="mailto:orx.ugur.arikan@gmail.com" /> to share your thoughts and experiences
                 (and certainly contact me if you find a macro-free solution 🫶).
             </p>
 
@@ -980,59 +1077,160 @@ assert_eq!(
 );`;
 
 
-const exampleSum = `// set up and example implementations
+const exampleCriteria = `use std::collections::HashMap;
 
-pub trait Sum {
-    fn sum(self) -> i64;
+#[derive(PartialEq, Eq, Hash, Clone, Copy)]
+pub struct City(usize);
+
+pub struct Tour(Vec<City>);
+
+#[derive(Default, Debug)]
+pub struct Status {
+    penalty_cost: u64,
+    violations: Vec<String>,
 }
 
-impl Sum for i16 {
-    fn sum(self) -> i64 {
-        self as i64
+pub trait Criterion {
+    fn evaluate(&self, tour: &Tour, previous_status: Status) -> Status;
+}
+
+// distance
+
+pub struct Distance {
+    distances: HashMap<(City, City), u64>,
+    penalty_per_km: u64,
+}
+
+impl Distance {
+    fn new_example() -> Self {
+        Distance {
+            distances: [
+                ((City(0), City(1)), 10), ((City(0), City(2)), 7), ((City(0), City(3)), 20),
+                ((City(1), City(0)), 57), ((City(1), City(2)), 9), ((City(1), City(3)), 11),
+                ((City(2), City(0)), 3), ((City(2), City(1)), 15), ((City(2), City(3)), 7),
+                ((City(3), City(0)), 88), ((City(3), City(1)), 18), ((City(3), City(2)), 8),
+            ]
+            .into_iter()
+            .collect(),
+            penalty_per_km: 1,
+        }
     }
 }
 
-impl Sum for i32 {
-    fn sum(self) -> i64 {
-        self as i64
+impl Criterion for Distance {
+    fn evaluate(&self, tour: &Tour, mut status: Status) -> Status {
+        for (a, b) in tour.0.iter().zip(tour.0.iter().skip(1)) {
+            let distance_km = self.distances.get(&(*a, *b)).unwrap();
+            status.penalty_cost += self.penalty_per_km * distance_km;
+        }
+        status
     }
 }
 
-impl Sum for i64 {
-    fn sum(self) -> i64 {
-        self
+// capacity
+
+pub struct Capacity {
+    vehicle_capacity: u64,
+    shipment_volumes: HashMap<City, i64>,
+}
+
+impl Capacity {
+    fn new_example() -> Self {
+        Self {
+            vehicle_capacity: 10,
+            shipment_volumes: [(City(0), 5), (City(1), 7), (City(2), -4), (City(3), -8)]
+                .into_iter()
+                .collect(),
+        }
     }
 }
 
-// composition with queues
+impl Criterion for Capacity {
+    fn evaluate(&self, tour: &Tour, mut status: Status) -> Status {
+        let vehicle_capacity = self.vehicle_capacity as i64;
+        let mut current_capacity = 0;
+        for city in &tour.0 {
+            let volume = self.shipment_volumes.get(city).unwrap();
+            current_capacity += volume;
+            if current_capacity > vehicle_capacity {
+                let violation = format!(
+                    "Capacity reached {} while vehicle capacity is {}.",
+                    current_capacity, self.vehicle_capacity
+                );
+                status.violations.push(violation);
+            }
+        }
+        status
+    }
+}
+
+// precedence
+
+pub struct Precedence {
+    must_precede: Vec<(City, City)>,
+    penalty_per_violation: u64,
+}
+
+impl Precedence {
+    fn new_example() -> Self {
+        Self {
+            must_precede: vec![(City(2), City(0))],
+            penalty_per_violation: 100,
+        }
+    }
+}
+
+impl Criterion for Precedence {
+    fn evaluate(&self, tour: &Tour, mut status: Status) -> Status {
+        for (a, b) in &self.must_precede {
+            let pos_a = tour.0.iter().position(|x| x == a).unwrap();
+            let pos_b = tour.0.iter().position(|x| x == b).unwrap();
+            if pos_a > pos_b {
+                status.penalty_cost += self.penalty_per_violation;
+                let violation = format!("Precedence {}->{} is violated.", a.0, b.0);
+                status.violations.push(violation);
+            }
+        }
+        status
+    }
+}
+
+// queue
 
 orx_meta::define_queue!(
-    elements => [ Sum ];
-    queue => [ StQueue ; EmptyQueue, Queue ];
+    elements => [ Criterion ];
+    queue => [ StCriteria; EmptyCriteria, Criteria ];
 );
 
-impl Sum for EmptyQueue {
-    fn sum(self) -> i64 {
-        0 // identity
+impl Criterion for EmptyCriteria {
+    // identity: return the previous state
+    fn evaluate(&self, _: &Tour, previous_status: Status) -> Status {
+        previous_status
     }
 }
 
-impl<F: Sum, B: StQueue> Sum for Queue<F, B> {
-    fn sum(self) -> i64 {
-        self.f.sum() + self.b.sum() // composition
+impl<F: Criterion, B: StCriteria> Criterion for Criteria<F, B> {
+    // composition: evaluate them both
+    fn evaluate(&self, tour: &Tour, status: Status) -> Status {
+        let status = self.f.evaluate(tour, status);
+        self.b.evaluate(tour, status)
     }
 }
 
-let queue = EmptyQueue::new()
-    .push(1i16)
-    .push(2i32)
-    .push(3i32)
-    .push(4i64)
-    .push(5i32)
-    .push(6i64)
-    .push(7i16);
-let sum = queue.sum();
-assert_eq!(sum, 28);`;
+// example
+
+let tour = Tour(vec![City(0), City(1), City(2), City(3)]);
+
+let criteria = Criteria::new(Distance::new_example())
+    .push(Capacity::new_example())
+    .push(Precedence::new_example());
+
+let status = criteria.evaluate(&tour, Status::default());
+
+println!("{status:?}");
+
+// prints out:
+// Status { penalty_cost: 126, violations: ["Capacity reached 12 while vehicle capacity is 10.", "Precedence 2->0 is violated."] }`;
 
 
 const wontCompile = `trait StQueue<X>: X {
@@ -1071,4 +1269,109 @@ const screenImplDraw = `impl<F: Draw, B: StScreen> Draw for Screen<F, B> {
         self.f.draw();
         self.b.draw();
     }
+}`;
+
+
+const startupTraitObjects = `// # json file
+[
+    {
+        "type": "Button",
+        "width": 3,
+        "height": 4,
+        "label": "home"
+    },
+    {
+        "type": "Button",
+        "width": 5,
+        "height": 4,
+        "label": "about"
+    },
+    {
+        "type": "SelectBox",
+        "width": 5,
+        "height": 4,
+        "options": [
+            "one"
+        ]
+    },
+    {
+        "type": "Button",
+        "width": 6,
+        "height": 6,
+        "label": "login"
+    }
+]
+    
+// # start up code (trait objects)
+
+fn new_screen() -> Vec<Box<dyn Draw>> {
+    let data = std::fs::read_to_string("path").unwrap();
+    serde_json::from_str(&data).unwrap()
+}
+`;
+
+
+const startupQueue = `// # start up code (statically-typed queue)
+
+fn new_screen() -> impl Draw {
+    EmptyScreen::new()
+        .push(Button {
+            width: 3,
+            height: 4,
+            label: "home".to_string(),
+        })
+        .push(Button {
+            width: 5,
+            height: 4,
+            label: "about".to_string(),
+        })
+        .push(SelectBox {
+            width: 5,
+            height: 4,
+            options: vec!["one".to_string()],
+        })
+        .push(Button {
+            width: 6,
+            height: 6,
+            label: "login".to_string(),
+        })
+}`;
+
+
+const criteriaCombinations = `fn use_case1() {
+    println!("# Use case with criteria [Distance]");
+    let tour = Tour(vec![City(0), City(1), City(2), City(3)]);
+
+    let criteria = Criteria::new(Distance::new_example());
+    let status = criteria.evaluate(&tour, Status::default());
+    println!("{status:?}");
+}
+
+fn use_case2() {
+    println!("# Use case with criteria [Distance, Precedence]");
+    let tour = Tour(vec![City(0), City(1), City(2), City(3)]);
+
+    let criteria = Criteria::new(Distance::new_example()).push(Precedence::new_example());
+    let status = criteria.evaluate(&tour, Status::default());
+    println!("{status:?}");
+}
+
+fn use_case3() {
+    println!("# Use case with criteria [Distance, Capacity]");
+    let tour = Tour(vec![City(0), City(1), City(2), City(3)]);
+
+    let criteria = Criteria::new(Distance::new_example()).push(Capacity::new_example());
+    let status = criteria.evaluate(&tour, Status::default());
+    println!("{status:?}");
+}
+
+fn use_case4() {
+    println!("# Use case with criteria [Distance, Capacity, Precedence]");
+    let tour = Tour(vec![City(0), City(1), City(2), City(3)]);
+
+    let criteria = Criteria::new(Distance::new_example())
+        .push(Capacity::new_example())
+        .push(Precedence::new_example());
+    let status = criteria.evaluate(&tour, Status::default());
+    println!("{status:?}");
 }`;
