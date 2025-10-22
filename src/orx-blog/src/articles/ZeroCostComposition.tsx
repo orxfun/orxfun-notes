@@ -29,7 +29,7 @@ const Content = () => {
             </p>
 
             <p>
-                To demonstrate, let's consider the classical example on polymorphism.
+                To demonstrate, let's consider the classical example about polymorphism.
             </p>
 
             <div className="emphasis">
@@ -45,39 +45,34 @@ const Content = () => {
             </p>
 
             <p>
-                Before diving in, a brief note on the generic associated types (GATs) which is a relatively recent feature of rust type system.
+                Before diving in, a brief note on the generic associated types (GATs).
             </p>
 
             <p>
                 GATs are often associated with lifetimes.
-                This is natural as it solves important lifetime-related issues.
-                Even when the initiative was introduced, the examples focused on solving lifetime issues,
-                as in this <Link text="amazing article" href="https://rust-lang.github.io/generic-associated-types-initiative/explainer/iterable.html" />.
+                This is natural since it solves important lifetime-related issues as demonstrated in the&nbsp;
+                <Link text="article on iterables" href="https://rust-lang.github.io/generic-associated-types-initiative/explainer/iterable.html" />.
                 However, its power goes way beyond.&nbsp;
-                <span className="inline-emphasis">GATs are functions of the type system</span> and functions are powerful.
+                To understand this, it might suffice to consider <span className="inline-emphasis">GATs as functions of the type system</span>.
                 The approach described in this article is based on this.
             </p>
 
             <p>
-                Discussed solution is published in the <code>queue</code> module of the <Link text="orx-meta" href="https://crates.io/crates/orx-meta" /> crate.
+                Discussed solution is published in the <span className="inline-emphasis">queue</span> module of the <span className="inline-emphasis">orx-meta</span>&nbsp;
+                <Link text="repo" href="https://github.com/orxfun/orx-meta" /> and <Link text="crate" href="https://crates.io/crates/orx-meta" />.
             </p>
 
             <h2>Another Way to Draw Components on the Screen</h2>
 
             <p>
-                The classical problem about polymorphism, which is also used in rust book's&nbsp;
+                The classical example about polymorphism, which is also used in rust book's&nbsp;
                 <Link text="trait objects chapter" href="https://doc.rust-lang.org/book/ch18-02-trait-objects.html" />, is as follows:
             </p>
 
             <div className="seq">
                 <div>We have a <code>Draw</code> trait and various components, such as button and select box, implement this trait.</div>
                 <div>The <code>Screen</code> is a collection of components that we can draw.</div>
-                <div>Three methods are required for the screen.</div>
-                <div>
-                    Screen is sort of a collection, so we need <code>new</code> to
-                    create an empty screen and <code>push</code> to add components.
-                </div>
-                <div>The third method <code>draw</code> is related to the common behavior and draws all components on the screen.</div>
+                <div>We need to create screens containing components of heterogeneous concrete types and draw all components on the screen.</div>
             </div>
 
             <p>We first set up the draw trait and a couple of implementations for demonstration.</p>
@@ -91,7 +86,7 @@ const Content = () => {
 
             <p>
                 Using trait objects can be considered as the standard way to solve this problem.
-                It is pretty much identical to solutions in object-oriented languages such as Java or C#.
+                It is very close to solutions in object-oriented languages such as Java or C#.
             </p>
 
             <Code code={solutionTraitObjects} />
@@ -143,15 +138,12 @@ const Content = () => {
                     <p style={{ color: 'lime', fontWeight: 'bold', textAlign: 'center' }}>PROS</p>
                     <div className="seq">
                         <div>
-                            No heap allocation required.
-                            We might waste some memory when sizes of different components vary significantly.
-                            Nevertheless, this is preferable over boxing in most cases.
+                            No heap allocation required for components&nbsp;
+                            (<i>we might waste some memory when sizes of different components vary significantly</i>⚠️).
                         </div>
                         <div>
-                            No virtual method calls.&nbsp;
-                            <code>component.draw()</code> is a direct call.
-                            It might have runtime branching cost due to potentially large <code>match</code> clause.
-                            This is still preferable over dynamic dispatch in most cases.
+                            No virtual method calls&nbsp;
+                            (<i>it might have runtime branching cost due to potentially large <code>match</code> clause</i>⚠️).
                         </div>
                         <div>
                             <code>Screen</code> is nothing but a wrapper for <code>Vec</code>.
@@ -167,7 +159,7 @@ const Content = () => {
                             Defining a new component and implementing <code>Draw</code> for it is not sufficient.
                             The variant must also be added to the <code>Component</code> enum.
                             And adding the variant is a breaking change ‼️
-                            Therefore, this approach is most suitable when only we extend and we don't extend often.
+                            Therefore, this approach is most suitable when only <i>we</i> extend and we don't extend often.
                         </div>
                         <div>
                             Some boilerplate involved in <code>Component::draw</code> implementation.
@@ -181,7 +173,7 @@ const Content = () => {
             <p>Notice that we end up with significantly different properties.</p>
 
             <p>
-                One thing in common though: we use a <code>Vec</code> to store the components.
+                One thing in common: we use a dynamic container to store components, such as <code>Vec</code>.
                 This will change in the third approach.
             </p>
 
@@ -206,15 +198,18 @@ const Content = () => {
 
             <ul>
                 <li><code>StScreen</code> is a trait representing a statically-typed queue of heterogeneous components 「(°ヘ°)</li>
-                <li><code>EmptyScreen</code> and non-empty <code>Screen</code> structs are the two <code>StScreen</code> implementations.</li>
+                <li>Single-component <code>ScreenSingle</code> and multiple-component <code>Screen</code> structs are the two <code>StScreen</code> implementations.</li>
                 <li>The screen, or queue of components, can only have elements that implement <code>Draw</code>.</li>
             </ul>
 
-            <p>Note that queue is the general term, while screen is used for this example; they are often used interchangeable in this article.</p>
+            <p>
+                Note that <span className="inline-emphasis">queue</span> is the general term, while <span className="inline-emphasis">screen</span> is used
+                for this example; they are often used interchangeably throughout this article.
+            </p>
 
             <p>
                 Lastly, in addition to individual components,&nbsp;
-                <span className="inline-emphasis">we require both empty and non-empty screen to implement Draw</span>.
+                <span className="inline-emphasis">we require screens to implement Draw</span>.
                 This is the key idea behind zero-cost compositions.
             </p>
 
@@ -252,8 +247,8 @@ const Content = () => {
                             On the other hand, we can conveniently work with it without needing its concrete type since it can be used as <code>impl Draw</code>.
                         </div>
                         <div>
-                            More importantly, it is statically-typed.
-                            This means that concrete types of all of its elements must be known at the compile time.
+                            It is statically-typed.
+                            This means that concrete types of all of its elements must be known at compile time.
                         </div>
                     </div>
                 </div>
@@ -309,11 +304,13 @@ const Content = () => {
             </p>
 
             <p>
-                Although this is not important for this problem, it is useful to clarify that this a queue.
-                We <code>push</code> to the back of the queue.
-                The <code>Front</code> element can be popped,
-                and <code>Back</code> represents the queue containing the remaining elements when the front element is popped.
-                This is a choice regarding other use cases, we could've chosen a stack or a double-ended queue as well.
+                <i>
+                    Although this is not important for this article, it is useful to clarify that this a queue.
+                    We <code>push</code> to the back of the queue.
+                    The <code>Front</code> element can be popped,
+                    and <code>Back</code> represents the queue containing the remaining elements when the front element is popped.
+                    This is a choice regarding other use cases, we could've chosen a stack or a double-ended queue as well.
+                </i>
             </p>
 
             <p>Most important detail of this trait is the following GAT:</p>
@@ -327,7 +324,7 @@ const Content = () => {
                 <div>Firstly, the condition <code>T: Draw</code> ensures that our queue may only contain <code>Draw</code> types.</div>
 
                 <div>
-                    Secondly, whatever the type we get by pushing <code>T</code> to the queue, it also has to implement <code>StScreen</code>, the trait itself.
+                    Secondly, whichever type we get by pushing <code>T</code> to the queue, it also has to implement <code>StScreen</code>, the trait itself.
                     This has <span className="inline-emphasis">the most useful consequence</span>.
                     It means that we can call <code>PushBack</code> on the resulting type;
                     and then we can call <code>PushBack</code> on the resulting type;
@@ -337,27 +334,33 @@ const Content = () => {
 
             </div>
 
-            <p>Now, all we need is two concrete implementations: one for empty queue and one for non-empty.</p>
 
 
+            <h3 style={{ textAlign: 'left', paddingLeft: '1rem' }}>ii. Queue with a single element</h3>
 
-            <h3 style={{ textAlign: 'left', paddingLeft: '1rem' }}>ii. Empty queue</h3>
+            <p><code>ScreenSingle&lt;F&gt;</code> is a queue containing only one element of type <code>F</code>.</p>
 
             <p>
-                This can be considered as the <code>Nil</code> of our queue.
-                The only important detail here is that, when we push component <code>T</code> to it,
-                we receive <code>Screen&lt;T, EmptyScreen&gt;</code>.
-                This is a screen with one component which is of type <code>T</code>.
+                The only important detail here is that, when we push component <code>T</code> to the back of it,
+                we receive <code>Screen&lt;F, ScreenSingle&lt;T&gt;&gt;</code>.
+                This is a screen with two components of types <code>F</code> and <code>T</code>, respectively.
             </p>
 
 
 
-            <h3 style={{ textAlign: 'left', paddingLeft: '1rem' }}>iii. Non-empty queue</h3>
+            <h3 style={{ textAlign: 'left', paddingLeft: '1rem' }}>iii. Queue with multiple elements</h3>
+
+            <p>The <code>Screen</code> is a queue that has at least two elements.</p>
+
+            <p>It is composed of two parts.</p>
+
+            <p><code>Front</code> is the element in the front of the queue.</p>
 
             <p>
-                The <code>Screen</code> is a queue that has at least one element which is at the <code>Front</code>.
-                The <code>Back</code> of it might be an <code>EmptyScreen</code> or another non-empty <code>Screen</code>.
-                Therefore, this struct can represent non-empty queues with any number of elements.
+                <code>Back</code> is the queue containing all elements except for the one in the front.
+                In other words, it is the queue we would obtain if we popped the element in the front.
+                It can be a single-element queue or another multiple-element queue.
+                Therefore, this generic struct can represent all queues with multiple number of elements.
             </p>
 
             <p>See the implementation of the <code>PushBack</code> GAT.</p>
@@ -366,10 +369,10 @@ const Content = () => {
 
             <div className="seq">
                 <div>
-                    It is straightforward to see that the resulting type must be a non-empty <code>Screen</code> since we are pushing an element
-                    to the current queue.
+                    It is straightforward to see that the resulting type must be another multiple-element <code>Screen</code> since
+                    we are adding an element to it.
                 </div>
-                <div>Since this is a queue, we want to keep the front <code>F</code> in the front of the new queue as well.</div>
+                <div>We need to keep the front <code>F</code> in the front of the new queue as well.</div>
                 <div>
                     Back of the current queue <code>B</code> is also a queue; i.e., <code>StScreen</code>.
                     This allows us to call <code>B::PushBack&lt;T&gt;</code> to determine type of back of the new queue.
@@ -395,36 +398,29 @@ const Content = () => {
                 </thead>
                 <tbody>
                     <tr>
-                        <td>0</td>
-                        <td></td>
-                        <td><code>EmptyScreen</code></td>
-                    </tr>
-                    <tr>
                         <td>1</td>
                         <td><code>C1</code></td>
-                        <td><code>Screen&lt;C1, EmptyScreen&gt;</code></td>
+                        <td><code>ScreenSingle&lt;C1&gt;</code></td>
                     </tr>
                     <tr>
                         <td>2</td>
                         <td><code>C1, C2</code></td>
-                        <td><code>Screen&lt;C1, Screen&lt;C2, EmptyScreen&gt;&gt;</code></td>
+                        <td><code>Screen&lt;C1, ScreenSingle&lt;C2&gt;&gt;</code></td>
                     </tr>
                     <tr>
                         <td>3</td>
                         <td><code>C1, C2, C3</code></td>
-                        <td><code>Screen&lt;C1, Screen&lt;C2, Screen&lt;C3, EmptyScreen&gt;&gt;&gt;</code></td>
+                        <td><code>Screen&lt;C1, Screen&lt;C2, ScreenSingle&lt;C3&gt;&gt;&gt;</code></td>
                     </tr>
                     <tr>
                         <td>4</td>
                         <td><code>C1, C2, C3, C4</code></td>
-                        <td><code>Screen&lt;C1, Screen&lt;C2, Screen&lt;C3, Screen&lt;C4, EmptyScreen&gt;&gt;&gt;&gt;</code></td>
+                        <td><code>Screen&lt;C1, Screen&lt;C2, Screen&lt;C3, ScreenSingle&lt;C4&gt;&gt;&gt;&gt;</code></td>
                     </tr>
                 </tbody>
             </table>
 
             <p>This is all we need to represent all statically-typed queues!</p>
-
-            <p>All these concrete types are available to us through one trait and two implementations.</p>
 
 
 
@@ -458,39 +454,34 @@ const Content = () => {
 
 
 
-            <h2>The Idea of Composition</h2>
+            <h2>Composition</h2>
 
             <p>After the side quest, we bring back the <code>Draw</code> requirement.</p>
 
             <p>
                 We do not want a queue of anything.
-                We want a queue of things that share a common behavior.
+                Instead, we want a queue of things that share a common behavior.
             </p>
 
             <p>
-                In addition to elements of the queue,&nbsp;
-                <span className="inline-emphasis"> we require the queue itself to implement the common behavior</span>.
+                In addition, <span className="inline-emphasis"> we want the queue itself to implement the common behavior</span>.
                 This is how we achieve zero-cost composition.
             </p>
 
-            <h3 style={{ textAlign: 'left', paddingLeft: '1rem' }}>Identity: Draw for empty Queue</h3>
+            <h3 style={{ textAlign: 'left', paddingLeft: '1rem' }}>Identity: Draw for Single-Element Queue</h3>
+
+            <p>We need to implement the common behavior for the queue containing a single element which satisfies the common behavior.</p>
+
+            <p>This is straightforward since there is only one way to implement this.</p>
+
+            <p>The single-element queue behaves exactly as its element.</p>
+
+
+            <h3 style={{ textAlign: 'left', paddingLeft: '1rem' }}>Composition: Draw for Multiple-Element Queue</h3>
 
             <p>
-                Implementing the common behavior for the empty queue describes what we should do in the absence of any elements.
-                This is straightforward for the screen example, we do nothing when there is nothing to draw.
-            </p>
-
-
-            <h3 style={{ textAlign: 'left', paddingLeft: '1rem' }}>Composition: Draw for non-empty Queue</h3>
-
-            <p>
-                Implementing the common behavior for the non-empty queue describes what we should do when there are multiple
-                elements.
-            </p>
-
-            <p>
-                This might be a bit confusing when the front of the queue is an element but the back of the queue is another queue
-                containing the remaining elements.
+                Implementing the common behavior for multiple-element queue might be a bit confusing when the front of the queue
+                is an element but the back of the queue is another queue containing the remaining elements.
             </p>
 
             <p>
@@ -507,25 +498,20 @@ const Content = () => {
             <Code code={screenImplDraw} />
 
             <p>
-                When we have two elements, our queue type is <code>Screen&lt;C1, Screen&lt;C2, EmptyScreen&gt;&gt;</code>.
-                Omitting the <code>self.</code> for brevity, we would have <code>f: C1</code>, <code>b: Screen&lt;C2, EmptyScreen&gt;</code>.
-                We can substitute <code>b.draw()</code> with <code>b.f.draw()</code> and <code>b.b.draw()</code>.
-                We stop here as <code>b.b</code> is an empty queue.
-                Therefore, the draw call on a two element queue could be inlined as <code>f.draw(); b.f.draw(); b.b.draw();</code>.
-                Since the last draw call on empty screen does nothing, this method would draw two of our components.
+                When we have two elements, our queue type is <code>Screen&lt;C1, ScreenSingle&lt;C2&gt;&gt;</code>.
+                Omitting the <code>self.</code> for brevity, we would have <code>f: C1</code>, <code>b: ScreenSingle&lt;C2&gt;</code>.
+                We can substitute <code>b.draw()</code> with <code>b.f.draw()</code> (identity of single-element queue).
+                Therefore, the draw call on a two element queue could be inlined as <code>f.draw(); b.f.draw();</code> drawing both components.
                 This is the expected behavior.
             </p>
 
             <p>
-                Notice that everything would work exactly the same if we had a queue of three elements; i.e., <code>Screen&lt;C1, Screen&lt;C2, Screen&lt;C3, EmptyScreen&gt;&gt;&gt;</code>.
-                We would do one more substitution to reach the empty queue and we would end up with <code>f.draw(); b.f.draw(); b.b.f.draw(); b.b.b.draw();</code>.
+                Notice that everything would work exactly the same if we had a queue of three elements; i.e., <code>Screen&lt;C1, Screen&lt;C2, ScreenSingle&lt;C3&gt;&gt;&gt;</code>.
+                We would do one more substitution to reach the single-element queue and we would end up with <code>f.draw(); b.f.draw(); b.b.f.draw();</code>.
                 This would draw three of the components, which is again the expected behavior.
             </p>
 
-            <p>
-                Therefore, once we define what to do with an empty queue and how to compose two elements,
-                we attain the expected behavior for any number of elements in the queue.
-            </p>
+            <p>Therefore, once we define how to compose two elements, we attain the expected behavior for any number of elements in the queue.</p>
 
 
 
@@ -545,41 +531,47 @@ const Content = () => {
                 and returns the new status.
             </p>
 
-            <p>
-                In real life, different operations and different regions might have different sets of criteria.
-                In the example below, we have three relevant criteria: <code>Distance</code>, <code>Capacity</code> and <code>Precedence</code>.
-            </p>
+            <p>We define three example criteria, <code>Distance</code>, <code>Capacity</code> and <code>Precedence</code> in the example below.</p>
 
             <p>
-                We again define our criteria queue with the <code>define_queue</code> macro.
+                However, one criterion is often not sufficient to solve a real life problem.
+                Different kinds of operations and different regions require different <span className="inline-emphasis">combinations of criteria</span>.
+                We can handle this combinatorial requirement by defining the composition.
             </p>
 
-            <p>
-                Then, we implement <code>Criterion</code> for our empty queue, <code>EmptyCriteria</code>.
-                It just returns back the <code>previous_state</code>.
-                This is the identity behavior of evaluation.
-            </p>
+            <div className="seq">
+                <div>We again define our criteria queue with the <code>define_queue</code> macro.</div>
 
-            <p>
-                Finally, we implement <code>Criterion</code> for the non-empty queue, <code>Criteria</code>.
-                Here, we first evaluate the tour with respect to the first criterion in the front.
-                Then, we pass on the resulting status to the back of the queue to evaluate.
-                This is the composition.
-            </p>
+                <div>
+                    First, we implement <code>Criterion</code> for the single-element queue.
+                    This is straightforward, it just evaluates the tour with its criterion.
+                </div>
 
+                <div>
+                    Second, we implement <code>Criterion</code> for multiple-element queue, <code>Criteria</code>.
+                    Here, we first evaluate the tour with respect to the first criterion in the front.
+                    Then, we pass on the resulting status to the back of the queue to evaluate.
+                    This is how we define composition for this use case.
+                </div>
+            </div>
+
+            <p><i>
+                You may skip the example criterion implementations and see the composition after the <code>// COMPOSITION</code> line.
+            </i></p>
 
             <Code code={exampleCriteria} />
 
 
 
 
+
             <h2>Why do we need the macro?</h2>
 
-            <p>It felt so close to represent this pattern without macros, but no luck ~( ´•︵•` )~</p>
+            <p>It felt so close to represent this pattern without macros, but no luck.</p>
 
             <p>
                 orx-meta crate provides the <code>StQueue</code> trait together with&nbsp;
-                <code>EmptyQueue</code> and <code>Queue</code> implementations.
+                <code>QueueSingle</code> and <code>Queue</code> implementations.
                 Naturally, these default implementations do not have the requirement on elements to be <code>Draw</code> or <code>Criterion</code>.
                 Therefore, they define <span className="inline-emphasis">statically-typed queue of anything</span>.
                 As explained in the builder side quest, this can still be useful.
@@ -592,11 +584,11 @@ const Content = () => {
             <Code code={wontCompile} />
 
             <p>
-                If we substitute <code>X</code> with <code>Draw</code> we obtain the <code>StScreen</code> trait in our example,
+                If we substitute <code>X</code> with <code>Draw</code>, we obtain the <code>StScreen</code> trait in our example;
                 if we substitute with <code>Criterion</code> we get <code>StCriteria</code>.
             </p>
 
-            <p><code>X</code> here is a trait, or I should say, it can be any trait.</p>
+            <p><code>X</code> here is a trait. I should say, it can be any trait.</p>
 
             <p>We need our <code>StQueue</code> trait to be generic over another trait.</p>
 
@@ -609,7 +601,7 @@ const Content = () => {
                 <li>Abstraction seems to be as simple as a string substitution.</li>
             </ul>
 
-            <p>Luckily, this is one of the easy cases for <code>macro_rules!</code></p>
+            <p>Luckily, this is one of the straightforward cases for <code>macro_rules!</code></p>
 
             <Code code={macro} />
 
@@ -618,8 +610,8 @@ const Content = () => {
             </p>
 
             <p>
-                The <code>queue</code> block is just giving names to (i) the statically-typed queue trait, (ii) empty queue struct
-                and (iii) non-empty queue struct.
+                The <code>queue</code> block is just giving names to (i) the statically-typed queue trait, (ii) single-element queue struct
+                and (iii) multiple-element queue struct.
             </p>
 
             <p>
@@ -631,7 +623,7 @@ const Content = () => {
                 Then, the macro defines the queue types exactly as we saw in the expansion with only one difference.
                 It adds the traits listed in <code>elements</code> as requirements to elements of the queues,
                 and it requires the queues to implement the traits themselves
-                (in other words, it replaces <code>X</code> above with these traits).
+                (simply substitutes <code>X</code> above with these traits).
             </p>
 
 
@@ -642,9 +634,13 @@ const Content = () => {
 
             <h2>Limitations and Use Cases</h2>
 
-            <p>As mentioned in the cons, having statically-typed elements limits potential use cases of the queue.</p>
+            <p>
+                As mentioned in the cons, having statically-typed elements limits potential use cases of the queue.
+                It is not a dynamic container.
+                We have to know types of all of its elements in compile time.
+            </p>
 
-            <p>In the following, we discuss two use cases where this pattern can be utilized.</p>
+            <p>In the following, we discuss two use cases where this pattern can be useful.</p>
 
 
 
@@ -652,23 +648,18 @@ const Content = () => {
             <h3 style={{ textAlign: 'left', paddingLeft: '1rem' }}>A. As a Collection, <code>Draw</code> Example</h3>
 
             <p>
-                Although it is statically-typed, we can still use the queue as a collection, as in the <code>Draw</code> example.
-                But recall that we have to know types of all elements during compile time.
+                Although it is statically-typed, we can still use the queue as a collection, as in the <code>Draw</code> example,
+                when know types of all elements during compile time.
             </p>
 
             <p>This fits to situations where we instantiate the collection during the <span className="inline-emphasis">start up</span> of a service.</p>
 
-            <p>
-                We often parse configuration files into the collection.
-                For instance, we can have a json file listing components to be included in the screen.
-            </p>
+            <p>Example below demonstrates screen initialization with two approaches:</p>
 
-            <p>This means that we know the types of all components, we can also use the statically-typed queue.</p>
-
-            <p>
-                In the following, we a screen initialization as a vector of trait objects parsed from a json file on the left,
-                and as a statically-typed queue on the right.
-            </p>
+            <div className="seq">
+                <div>On the left, we use the trait objects approach creating the screen by parsing a configuration file.</div>
+                <div>On the right, we directly initiate the screen as a statically-typed queue.</div>
+            </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
                 <Code code={startupTraitObjects} />
@@ -676,44 +667,47 @@ const Content = () => {
             </div>
 
             <p>
-                Whenever configuration changes, we must re-compile with the queue approach.
-                On the other hand, initialization can never fail.
+                With the queue approach, we need to re-compile the code every time the configuration changes.
+                And due to compiler limitations, the queue cannot have too many elements.
+                As far as I experienced, the compiler seems to struggle when we add more than 256 elements.
             </p>
+
+            <p>On the other hand, initialization can never fail, runtime errors are not possible.</p>
 
             <p>Further, the queue brings performance and memory advantages.</p>
 
             <p>
-                For a screen containing 200 components with toy draw implementations, statically-typed queue approach is two times faster than
-                trait objects or enum-components approaches.
+                For a screen containing 200 components with toy draw implementations,
+                statically-typed queue approach is two times faster than trait objects or enum-components approaches.
                 You may see the corresponding benchmarks <Link text="here" href="https://github.com/orxfun/orx-meta/tree/main/benches" />.
             </p>
 
-            <p>Further, being memory efficient and not requiring heap allocation makes it beneficial for embedded applications.</p>
-
-            <p>
-                We must, however, be careful about the queue size.
-                As far as I experienced, the compiler does not seem happy for queues with more than 256 elements ●﹏●
-            </p>
-
-
+            <p>Further, being memory efficient and not requiring heap allocation might make it beneficial for embedded applications.</p>
 
 
 
             <h3 style={{ textAlign: 'left', paddingLeft: '1rem' }}>B. Tool to deal with Custom Requirements, <code>Criteria</code> Example</h3>
 
-            <p>This has been the main idea to develop the queues for.</p>
+            <p>This is the main goal.</p>
 
             <p>
-                Assume that we are maintaining a performance-critical tool with with, say, <code>5</code> features.
-                We want our tool to be useful for as many use cases as possible.
+                Assume that we are maintaining a performance-critical tool with with, say, <code>5</code> features
+                (<i>we will never have 256 features</i>).
+            </p>
+
+            <p>
                 Every use case requires a different subset of our features.
+                We want our tool to be useful for as many use cases as possible.
+            </p>
+
+            <p>
                 There exist <code>2^5-1 = 31</code> potential use cases.
                 How can we cover them all?
             </p>
 
             <p>
                 We will not have fun if we need to manually combine the features;
-                or if we lose performance due to abstraction.
+                or if we lose performance when we combine them.
             </p>
 
             <p>On the other hand, if we can define the composition of these features using a statically-typed queue:</p>
@@ -755,12 +749,12 @@ const Content = () => {
                 I first started experimenting with GATs for composing business constraints and objectives for a performance-critical route optimization library.
                 If you are interested, you may check a relevant <Link text="talk" href="https://orxfun.github.io/talk-composing-zero-cost-abstractions-in-route-optimization/" />&nbsp;
                 discussing the importance of zero cost composition.
-                Actually, it seems to be the only way to achieve a <span className="inline-emphasis">performant, extensible and maintainable solution at the same time</span>.
+                It seems to be the solution to achieve a <span className="inline-emphasis">performant, extensible and maintainable solution at the same time</span>.
                 The generalization led to the queue explained here, and seems like I will be using it more for algorithm abstractions such as the local search.
             </p>
 
             <p>
-                Nevertheless, the approach is still new, at least to me.
+                The approach is still new, at least to me.
                 Feel free to contact <Link text="me" href="mailto:orx.ugur.arikan@gmail.com" /> to share your thoughts and experiences
                 (and certainly contact me if you find a macro-free solution 🫶).
             </p>
@@ -889,12 +883,14 @@ screen.draw();`;
 
 const solutionComposition = `orx_meta::define_queue!(
     elements => [ Draw ];
-    queue => [ StScreen; EmptyScreen, Screen ];
+    queue => [ StScreen; ScreenSimple, Screen ];
 );
 
-impl Draw for EmptyScreen {
-    // identity: do nothing
-    fn draw(&self) {}
+impl<F: Draw> Draw for ScreenSimple<F> {
+    // identity: just draw the single element
+    fn draw(&self) {
+        self.f.draw();
+    }
 }
 
 impl<F: Draw, B: StScreen> Draw for Screen<F, B> {
@@ -905,11 +901,11 @@ impl<F: Draw, B: StScreen> Draw for Screen<F, B> {
     }
 }
 
-let screen = EmptyScreen::new()
-    .push(Button::new(3, 4, "home".to_string()))
+let screen = Screen::new(Button::new(3, 4, "home".to_string()))
     .push(Button::new(5, 4, "about".to_string()))
     .push(SelectBox::new(5, 4, vec!["one".to_string()]))
     .push(Button::new(6, 6, "login".to_string()));
+
 screen.draw();`;
 
 const solutionCompositionHandWritten = `struct Screen { // no heap allocation, no Vec
@@ -934,68 +930,72 @@ let screen = Screen {
     sbox: SelectBox::new(5, 4, vec!["one".to_string()]),
     btn3: Button::new(6, 6, "login".to_string()),
 };
+
 screen.draw();`;
 
 const solutionCompositionExpansion = `// expansion of the macro
-trait StScreen: Draw {
-    type PushBack<T>: StScreen
-    where
-        T: Draw;
 
-    type Front;
+trait StScreen: Draw {
+    type PushBack<Elem>: StScreen
+    where
+        Elem: Draw;
+
+    type Front: Draw;
 
     type Back: StScreen;
 
     const LEN: usize;
 
+    fn push<Elem>(self, element: Elem) -> Self::PushBack<Elem>
+    where
+        Elem: Draw;
+
     fn len(&self) -> usize {
         Self::LEN
     }
 
-    fn push<T>(self, element: T) -> Self::PushBack<T>
-    where
-        T: Draw;
+    fn front(&self) -> &Self::Front;
 }
 
-struct EmptyScreen;
+// single-element queue
+struct ScreenSingle<F: Draw> {
+    front: F,
+}
 
-impl StScreen for EmptyScreen {
-    type PushBack<T>
-        = Screen<T, EmptyScreen>
+impl<F: Draw> StScreen for ScreenSingle<F> {
+    type PushBack<Elem>
+        = Screen<F, ScreenSingle<Elem>>
     where
-        T: Draw;
+        Elem: Draw;
 
-    type Front = Self;
+    type Front = F;
 
     type Back = Self;
 
-    const LEN: usize = 0;
+    const LEN: usize = 1;
 
-    fn push<T>(self, element: T) -> Self::PushBack<T>
+    fn push<Elem>(self, element: Elem) -> Self::PushBack<Elem>
     where
-        T: Draw,
+        Elem: Draw,
     {
         Screen {
-            f: element,
-            b: EmptyScreen,
+            front: self.front,
+            back: ScreenSingle { front: element },
         }
+    }
+
+    fn front(&self) -> &Self::Front {
+        &self.front
     }
 }
 
-struct Screen<F, B>
-where
-    F: Draw,
-    B: StScreen,
-{
-    f: F,
-    b: B,
+// multiple-element queue
+struct Screen<F: Draw, B: StScreen> {
+    front: F,
+    back: B,
 }
 
-impl<F, B> StScreen for Screen<F, B>
-where
-    F: Draw,
-    B: StScreen,
-{
+impl<F: Draw, B: StScreen> StScreen for Screen<F, B> {
     type PushBack<T>
         = Screen<F, B::PushBack<T>>
     where
@@ -1012,17 +1012,30 @@ where
         T: Draw,
     {
         Screen {
-            f: self.f,
-            b: self.b.push(element),
+            front: self.front,
+            back: self.back.push(element),
         }
+    }
+
+    fn front(&self) -> &Self::Front {
+        &self.front
     }
 }
 
+impl<F: Draw> Screen<F, ScreenSingle<F>> {
+    pub fn new(element: F) -> ScreenSingle<F> {
+        ScreenSingle { front: element }
+    }
+}
+
+
 // remaining is same as above
 
-impl Draw for EmptyScreen {
-    // identity: do nothing
-    fn draw(&self) {}
+impl<F: Draw> Draw for ScreenSimple<F> {
+    // identity: just draw the single element
+    fn draw(&self) {
+        self.f.draw();
+    }
 }
 
 impl<F: Draw, B: StScreen> Draw for Screen<F, B> {
@@ -1033,11 +1046,11 @@ impl<F: Draw, B: StScreen> Draw for Screen<F, B> {
     }
 }
 
-let screen = EmptyScreen
-    .push(Button::new(3, 4, "home".to_string()))
+let screen = Screen::new(Button::new(3, 4, "home".to_string()))
     .push(Button::new(5, 4, "about".to_string()))
     .push(SelectBox::new(5, 4, vec!["one".to_string()]))
     .push(Button::new(6, 6, "login".to_string()));
+
 screen.draw();`;
 
 const genericQueueBuilder = `use orx_meta::queue::*;
@@ -1102,7 +1115,7 @@ pub struct Distance {
 }
 
 impl Distance {
-    fn new_example() -> Self {
+    fn new() -> Self {
         Distance {
             distances: [
                 ((City(0), City(1)), 10), ((City(0), City(2)), 7), ((City(0), City(3)), 20),
@@ -1135,7 +1148,7 @@ pub struct Capacity {
 }
 
 impl Capacity {
-    fn new_example() -> Self {
+    fn new() -> Self {
         Self {
             vehicle_capacity: 10,
             shipment_volumes: [(City(0), 5), (City(1), 7), (City(2), -4), (City(3), -8)]
@@ -1172,7 +1185,7 @@ pub struct Precedence {
 }
 
 impl Precedence {
-    fn new_example() -> Self {
+    fn new() -> Self {
         Self {
             must_precede: vec![(City(2), City(0))],
             penalty_per_violation: 100,
@@ -1195,17 +1208,17 @@ impl Criterion for Precedence {
     }
 }
 
-// queue
+// COMPOSITION
 
 orx_meta::define_queue!(
     elements => [ Criterion ];
-    queue => [ StCriteria; EmptyCriteria, Criteria ];
+    queue => [ StCriteria; CriteriaSingle, Criteria ];
 );
 
-impl Criterion for EmptyCriteria {
-    // identity: return the previous state
-    fn evaluate(&self, _: &Tour, previous_status: Status) -> Status {
-        previous_status
+impl<F: Criterion> Criterion for CriteriaSingle<F> {
+    // identity: evaluate wrt the single criterion
+    fn evaluate(&self, tour: &Tour, status: Status) -> Status {
+        self.f.evaluate(tour, status)
     }
 }
 
@@ -1221,9 +1234,9 @@ impl<F: Criterion, B: StCriteria> Criterion for Criteria<F, B> {
 
 let tour = Tour(vec![City(0), City(1), City(2), City(3)]);
 
-let criteria = Criteria::new(Distance::new_example())
-    .push(Capacity::new_example())
-    .push(Precedence::new_example());
+let criteria = Criteria::new(Distance::new())
+    .push(Capacity::new())
+    .push(Precedence::new());
 
 let status = criteria.evaluate(&tour, Status::default());
 
@@ -1251,7 +1264,7 @@ const wontCompile = `trait StQueue<X>: X {
 
 const macro = `orx_meta::define_queue!(
     elements => [ Draw ];
-    queue => [ StScreen; EmptyScreen, Screen ];
+    queue => [ StScreen; ScreenSingle, Screen ];
 );`;
 
 
@@ -1314,27 +1327,26 @@ fn new_screen() -> Vec<Box<dyn Draw>> {
 const startupQueue = `// # start up code (statically-typed queue)
 
 fn new_screen() -> impl Draw {
-    EmptyScreen::new()
-        .push(Button {
-            width: 3,
-            height: 4,
-            label: "home".to_string(),
-        })
-        .push(Button {
-            width: 5,
-            height: 4,
-            label: "about".to_string(),
-        })
-        .push(SelectBox {
-            width: 5,
-            height: 4,
-            options: vec!["one".to_string()],
-        })
-        .push(Button {
-            width: 6,
-            height: 6,
-            label: "login".to_string(),
-        })
+    Screen::new(Button {
+        width: 3,
+        height: 4,
+        label: "home".to_string(),
+    })
+    .push(Button {
+        width: 5,
+        height: 4,
+        label: "about".to_string(),
+    })
+    .push(SelectBox {
+        width: 5,
+        height: 4,
+        options: vec!["one".to_string()],
+    })
+    .push(Button {
+        width: 6,
+        height: 6,
+        label: "login".to_string(),
+    })
 }`;
 
 
@@ -1342,7 +1354,7 @@ const criteriaCombinations = `fn use_case1() {
     println!("# Use case with criteria [Distance]");
     let tour = Tour(vec![City(0), City(1), City(2), City(3)]);
 
-    let criteria = Criteria::new(Distance::new_example());
+    let criteria = Criteria::new(Distance::new());
     let status = criteria.evaluate(&tour, Status::default());
     println!("{status:?}");
 }
@@ -1351,7 +1363,7 @@ fn use_case2() {
     println!("# Use case with criteria [Distance, Precedence]");
     let tour = Tour(vec![City(0), City(1), City(2), City(3)]);
 
-    let criteria = Criteria::new(Distance::new_example()).push(Precedence::new_example());
+    let criteria = Criteria::new(Distance::new()).push(Precedence::new());
     let status = criteria.evaluate(&tour, Status::default());
     println!("{status:?}");
 }
@@ -1360,7 +1372,7 @@ fn use_case3() {
     println!("# Use case with criteria [Distance, Capacity]");
     let tour = Tour(vec![City(0), City(1), City(2), City(3)]);
 
-    let criteria = Criteria::new(Distance::new_example()).push(Capacity::new_example());
+    let criteria = Criteria::new(Distance::new()).push(Capacity::new());
     let status = criteria.evaluate(&tour, Status::default());
     println!("{status:?}");
 }
@@ -1369,9 +1381,9 @@ fn use_case4() {
     println!("# Use case with criteria [Distance, Capacity, Precedence]");
     let tour = Tour(vec![City(0), City(1), City(2), City(3)]);
 
-    let criteria = Criteria::new(Distance::new_example())
-        .push(Capacity::new_example())
-        .push(Precedence::new_example());
+    let criteria = Criteria::new(Distance::new())
+        .push(Capacity::new())
+        .push(Precedence::new());
     let status = criteria.evaluate(&tour, Status::default());
     println!("{status:?}");
 }`;
