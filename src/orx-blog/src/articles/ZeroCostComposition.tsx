@@ -248,7 +248,7 @@ const Content = () => {
                         </div>
                         <div>
                             It is statically-typed.
-                            This means that concrete types of all of its elements must be known at the compile time.
+                            This means that concrete types of all of its elements must be known at compile time.
                         </div>
                     </div>
                 </div>
@@ -324,7 +324,7 @@ const Content = () => {
                 <div>Firstly, the condition <code>T: Draw</code> ensures that our queue may only contain <code>Draw</code> types.</div>
 
                 <div>
-                    Secondly, whatever the type we get by pushing <code>T</code> to the queue, it also has to implement <code>StScreen</code>, the trait itself.
+                    Secondly, whichever type we get by pushing <code>T</code> to the queue, it also has to implement <code>StScreen</code>, the trait itself.
                     This has <span className="inline-emphasis">the most useful consequence</span>.
                     It means that we can call <code>PushBack</code> on the resulting type;
                     and then we can call <code>PushBack</code> on the resulting type;
@@ -333,8 +333,6 @@ const Content = () => {
                 </div>
 
             </div>
-
-            <p>Now, all we need is two concrete implementations of this trait.</p>
 
 
 
@@ -359,8 +357,8 @@ const Content = () => {
             <p><code>Front</code> is the element in the front of the queue.</p>
 
             <p>
-                <code>Back</code> is the queue containing all elements except for the one in the front; i.e.,
-                it is the queue we would obtain if we popped the element in the front.
+                <code>Back</code> is the queue containing all elements except for the one in the front.
+                In other words, it is the queue we would obtain if we popped the element in the front.
                 It can be a single-element queue or another multiple-element queue.
                 Therefore, this generic struct can represent all queues with multiple number of elements.
             </p>
@@ -456,7 +454,7 @@ const Content = () => {
 
 
 
-            <h2>The Idea of Composition</h2>
+            <h2>Composition</h2>
 
             <p>After the side quest, we bring back the <code>Draw</code> requirement.</p>
 
@@ -474,24 +472,16 @@ const Content = () => {
 
             <p>We need to implement the common behavior for the queue containing a single element which satisfies the common behavior.</p>
 
-            <p>This is straightforward.</p>
+            <p>This is straightforward since there is only one way to implement this.</p>
 
-            <p>
-                There is only one way to implement this.
-                The single-element queue behaves exactly as its element.
-            </p>
+            <p>The single-element queue behaves exactly as its element.</p>
 
 
             <h3 style={{ textAlign: 'left', paddingLeft: '1rem' }}>Composition: Draw for Multiple-Element Queue</h3>
 
             <p>
-                In order to implement the common behavior for multiple-element queue, we need to define the expected behavior when
-                there are multiple elements.
-            </p>
-
-            <p>
-                This might be a bit confusing when the front of the queue is an element but the back of the queue is another queue
-                containing the remaining elements.
+                Implementing the common behavior for multiple-element queue might be a bit confusing when the front of the queue
+                is an element but the back of the queue is another queue containing the remaining elements.
             </p>
 
             <p>
@@ -510,7 +500,7 @@ const Content = () => {
             <p>
                 When we have two elements, our queue type is <code>Screen&lt;C1, ScreenSingle&lt;C2&gt;&gt;</code>.
                 Omitting the <code>self.</code> for brevity, we would have <code>f: C1</code>, <code>b: ScreenSingle&lt;C2&gt;</code>.
-                We can substitute <code>b.draw()</code> with <code>b.f.draw()</code>.
+                We can substitute <code>b.draw()</code> with <code>b.f.draw()</code> (identity of single-element queue).
                 Therefore, the draw call on a two element queue could be inlined as <code>f.draw(); b.f.draw();</code> drawing both components.
                 This is the expected behavior.
             </p>
@@ -541,14 +531,13 @@ const Content = () => {
                 and returns the new status.
             </p>
 
-            <p>We define three example criteria, <code>Distance</code>, <code>Capacity</code> and <code>Precedence</code>, in the example below.</p>
+            <p>We define three example criteria, <code>Distance</code>, <code>Capacity</code> and <code>Precedence</code> in the example below.</p>
 
             <p>
-                However, one criterion often does not suffice to solve a real life problem.
-                Different kinds of operations and different regions require different <span className="inline-emphasis">sets of criteria</span>.
+                However, one criterion is often not sufficient to solve a real life problem.
+                Different kinds of operations and different regions require different <span className="inline-emphasis">combinations of criteria</span>.
+                We can handle this combinatorial requirement by defining the composition.
             </p>
-
-            <p>To define the composition of criteria, we can use the queue approach.</p>
 
             <div className="seq">
                 <div>We again define our criteria queue with the <code>define_queue</code> macro.</div>
@@ -567,7 +556,7 @@ const Content = () => {
             </div>
 
             <p><i>
-                You may skip the example criterion implementations and see the composition using the queues after the <code>// COMPOSITION</code> line.
+                You may skip the example criterion implementations and see the composition after the <code>// COMPOSITION</code> line.
             </i></p>
 
             <Code code={exampleCriteria} />
@@ -578,7 +567,7 @@ const Content = () => {
 
             <h2>Why do we need the macro?</h2>
 
-            <p>It felt so close to represent this pattern without macros, but no luck ~( ´•︵•` )~</p>
+            <p>It felt so close to represent this pattern without macros, but no luck.</p>
 
             <p>
                 orx-meta crate provides the <code>StQueue</code> trait together with&nbsp;
@@ -599,7 +588,7 @@ const Content = () => {
                 if we substitute with <code>Criterion</code> we get <code>StCriteria</code>.
             </p>
 
-            <p><code>X</code> here is a trait, or I should say, it can be any trait.</p>
+            <p><code>X</code> here is a trait. I should say, it can be any trait.</p>
 
             <p>We need our <code>StQueue</code> trait to be generic over another trait.</p>
 
@@ -634,7 +623,7 @@ const Content = () => {
                 Then, the macro defines the queue types exactly as we saw in the expansion with only one difference.
                 It adds the traits listed in <code>elements</code> as requirements to elements of the queues,
                 and it requires the queues to implement the traits themselves
-                (in other words, it replaces <code>X</code> above with these traits).
+                (simply substitutes <code>X</code> above with these traits).
             </p>
 
 
@@ -645,9 +634,13 @@ const Content = () => {
 
             <h2>Limitations and Use Cases</h2>
 
-            <p>As mentioned in the cons, having statically-typed elements limits potential use cases of the queue.</p>
+            <p>
+                As mentioned in the cons, having statically-typed elements limits potential use cases of the queue.
+                It is not a dynamic container.
+                We have to know types of all of its elements in compile time.
+            </p>
 
-            <p>In the following, we discuss two use cases where this pattern can be utilized.</p>
+            <p>In the following, we discuss two use cases where this pattern can be useful.</p>
 
 
 
@@ -661,15 +654,12 @@ const Content = () => {
 
             <p>This fits to situations where we instantiate the collection during the <span className="inline-emphasis">start up</span> of a service.</p>
 
-            <p>
-                We often parse configuration files into the collection.
-                For instance, we can have a json file listing components to be included in the screen.
-            </p>
+            <p>Example below demonstrates screen initialization with two approaches:</p>
 
-            <p>
-                In the following, we see screen initialization as a vector of trait objects parsed from a json file on the left,
-                and as a statically-typed queue on the right.
-            </p>
+            <div className="seq">
+                <div>On the left, we use the trait objects approach creating the screen by parsing a configuration file.</div>
+                <div>On the right, we directly initiate the screen as a statically-typed queue.</div>
+            </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr' }}>
                 <Code code={startupTraitObjects} />
@@ -701,16 +691,23 @@ const Content = () => {
             <p>This is the main goal.</p>
 
             <p>
-                Assume that we are maintaining a performance-critical tool with with, say, <code>5</code> features.
-                We want our tool to be useful for as many use cases as possible.
+                Assume that we are maintaining a performance-critical tool with with, say, <code>5</code> features
+                (<i>we will never have 256 features</i>).
+            </p>
+
+            <p>
                 Every use case requires a different subset of our features.
+                We want our tool to be useful for as many use cases as possible.
+            </p>
+
+            <p>
                 There exist <code>2^5-1 = 31</code> potential use cases.
                 How can we cover them all?
             </p>
 
             <p>
                 We will not have fun if we need to manually combine the features;
-                or if we lose performance due to abstraction.
+                or if we lose performance when we combine them.
             </p>
 
             <p>On the other hand, if we can define the composition of these features using a statically-typed queue:</p>
